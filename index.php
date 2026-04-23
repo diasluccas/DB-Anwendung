@@ -1,33 +1,76 @@
+<!-- LUCCAS DIAS - 2024-06-17 -->
+
+<?php
+session_start();
+include 'db.php';
+?>
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <title>Radrennen Datenbankanwendung</title>
-    <meta name="authors" content="Deniz, Felix und Luccas">
-    <meta name="copyright" content="DHBW">
-    <meta name="Keywords" content="Datenbankanwendung, Radrennen">
-    <meta http-equiv="Content-Type" content="text/html" charset="utf-8">
-    <link rel="index" href="index.html">
+    <title>RennHub</title>
 </head>
 <body>
-    <h1>RennHub</h1>
-    <h2>Dein Zentrum für Radrennen.</h2>
-    <p><b>WWIBE224</b> Deniz, Felix und Luccas</p>
-    <p><b>Note:</b> 1.0</p>
 
-    <hr />
-    <a href="index.php?seite=teams">Teams</a> | <a href="index.php?seite=rennen">Rennen</a>
-    <hr />
+<h1>RennHub</h1>
 
+<hr>
 
-    <?php
-    $seite = $_GET['seite'] ?? 'teams';
-    $allowed = ['teams', 'rennen'];
+<?php if (!isset($_SESSION['login_tc']) && !isset($_SESSION['login_rv'])): ?>
 
-    if (!in_array($seite, $allowed)) {
-        $seite = 'teams';
-    }
-    include $seite . '.php';
-    ?>
+    <a href="index.php?seite=teams">Teams</a> |
+    <a href="index.php?seite=rennen">Rennen</a>
+
+<?php elseif (isset($_SESSION['login_tc'])): ?>
+
+    <a href="index.php?seite=teams">Teams</a>
+
+<?php elseif (isset($_SESSION['login_rv'])): ?>
+
+    <a href="index.php?seite=rennen">Rennen</a>
+
+<?php endif; ?>
+
+<?php if (isset($_SESSION['login_tc']) || isset($_SESSION['login_rv'])): ?>
+    | <a href="index.php?seite=logout">Logout</a>
+<?php endif; ?>
+
+<hr>
+
+<?php
+
+$seite = $_GET['seite'] ?? 'teams';
+
+switch ($seite) {
+
+    case 'teams':
+        if (isset($_SESSION['login_rv'])) {
+            echo "Kein Zugriff!";
+            break;
+        }
+
+        include 'teams.php';
+        break;
+
+    case 'rennen':
+        if (isset($_SESSION['login_tc'])) {
+            echo "Kein Zugriff!";
+            break;
+        }
+
+        include 'rennen.php';
+        break;
+
+    case 'logout':
+        session_unset();
+        session_destroy();
+        header("Location: index.php");
+        exit;
+
+    default:
+        include 'teams.php';
+}
+?>
 
 </body>
 </html>
