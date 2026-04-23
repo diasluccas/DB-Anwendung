@@ -1,30 +1,77 @@
 <?php
 include 'db.php';
-include 'functionexists.php';
 ?>
 
 <h3>Teams</h3>
 
-<h3>Registrierung neuer TeamChef</h3>
+<h3>TeamChef</h3>
 
-<form method="POST" action="">
-    <label>Login Name:</label><br>
-    <input type="text" name="loginname" required><br>
+<div style="display: flex; gap: 50px;">
 
-    <label>Vorname:</label><br>
-    <input type="text" name="vorname"><br>
+    <div>
+        <h4>Login</h4>
+        <form method="POST">
+            <label>Login Name:</label><br>
+            <input type="text" name="loginname_login" required><br>
 
-    <label>Nachname:</label><br>
-    <input type="text" name="nachname"><br>
+            <label>Passwort:</label><br>
+            <input type="password" name="kennwort_login" required><br><br>
 
-    <label>Passwort:</label><br>
-    <input type="password" name="kennwort" required><br><br>
+            <input type="submit" name="login_tc" value="Login">
+        </form>
+    </div>
 
-    <label>Team Name:</label><br>
-    <input type="text" name="teamname" required><br><br>
+    <div>
+        <h4>Registrierung</h4>
+        <form method="POST">
+            <label>Login Name:</label><br>
+            <input type="text" name="loginname" required><br>
 
-    <input type="submit" name="submit_all" value="Registrieren">
-</form>
+            <label>Vorname:</label><br>
+            <input type="text" name="vorname"><br>
+
+            <label>Nachname:</label><br>
+            <input type="text" name="nachname"><br>
+
+            <label>Passwort:</label><br>
+            <input type="password" name="kennwort" required><br>
+
+            <label>Team Name:</label><br>
+            <input type="text" name="teamname" required><br><br>
+
+            <input type="submit" name="submit_all" value="Registrieren">
+        </form>
+    </div>
+
+</div>
+
+<?php
+if (isset($_POST['login_tc'])) {
+
+    $login = $_POST['loginname_login'];
+    $kennwort = $_POST['kennwort_login'];
+
+    $sql = "SELECT * FROM TeamChef WHERE LoginName = '$login'";
+    $result = mysqli_query($connection, $sql);
+
+    if (mysqli_num_rows($result) == 1) {
+
+        $user = mysqli_fetch_assoc($result);
+
+        if (password_verify($kennwort, $user['Kennwort'])) {
+
+            $_SESSION['login'] = $user['LoginName'];
+            echo "Login erfolgreich! Willkommen " . $user['Vorname'];
+
+        } else {
+            echo "Falsches Passwort!";
+        }
+
+    } else {
+        echo "User existiert nicht!";
+    }
+}
+?>
 
 <?php
 function exists($connection, $table, $column, $value) {
@@ -43,6 +90,7 @@ if (isset($_POST['submit_all'])) {
     $nachname = $_POST['nachname'];
     $kennwort = $_POST['kennwort'];
     $teamname = $_POST['teamname'];
+
     $hashed_pw = password_hash($kennwort, PASSWORD_DEFAULT);
 
     if (exists($connection, "TeamChef", "LoginName", $login)) {
@@ -73,6 +121,12 @@ if (isset($_POST['submit_all'])) {
         mysqli_rollback($connection);
         echo "Fehler!";
     }
+}
+?>
+
+<?php
+if (isset($_SESSION['login'])) {
+    echo "Eingeloggt als: " . $_SESSION['login'];
 }
 ?>
 
