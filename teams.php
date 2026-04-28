@@ -1,4 +1,4 @@
-<!-- LUCCAS DIAS - 2024-06-17 -->
+<!-- LUCCAS DIAS - 2026-04-28 -->
 
 <?php
 include 'db.php';
@@ -19,6 +19,7 @@ if (!isset($_SESSION['login_tc'])) {
 
     include 'teamsseite/teampflegen.php';
     include 'teamsseite/trainings.php';
+    include 'teamsseite/rennenanmelden.php';
     include 'teamsseite/darstellungkz.php';
 }
 ?>
