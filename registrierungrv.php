@@ -1,7 +1,8 @@
-<!-- LUCCAS DIAS - 2024-06-17 -->
+<!-- LUCCAS DIAS - 2026-04-28 -->
 
 <?php
 include 'db.php';
+include 'funktionen/exists.php';
 ?>
         <h4>Noch kein Konto? Registriere dich hier unten.</h4>
             <form method="POST" action="">
@@ -15,15 +16,6 @@ include 'db.php';
             </form>
 
 <hr />
-
-<?php
-function exists($connection, $table, $column, $value) {
-    $sql = "SELECT * FROM $table WHERE $column = '$value' LIMIT 1";
-    $result = mysqli_query($connection, $sql);
-
-    return mysqli_num_rows($result) > 0;
-}
-?>
 
 <?php
 if (isset($_POST['registrierung_rv'])) {
