@@ -1,6 +1,30 @@
 <?php
 include 'db.php';
+?>
 
+<h4>Neues Rennen anlegen</h4>
+<form method="POST" action="">
+    <label>Datum des Rennens:</label><br>
+    <input type="date" name="datum" required><br>
+
+    <label>Startort:</label><br>
+    <input type="text" name="startort" required><br>
+
+    <label>Anzahl Kilometer:</label><br>
+    <input type="number" name="km" required><br>
+
+    <label>Höhenmeter:</label><br>
+    <input type="number" name="hoehenmeter" required><br>
+
+    <label>Maximale Steigung in Prozent:</label><br>
+    <input type="number" name="steigung" step="0.1" required><br><br>
+
+    <input type="submit" name="Rennen_erstellen" value="Rennen speichern">
+</form>
+<hr />
+
+
+<?php
 if (isset($_POST['Rennen_erstellen'])) {
     // Daten aus dem Formular holen
     $datum = $_POST['datum'];
@@ -29,23 +53,3 @@ if (isset($_POST['Rennen_erstellen'])) {
 }
 ?>
 
-<h4>Neues Rennen anlegen</h4>
-<form method="POST" action="">
-    <label>Datum des Rennens:</label><br>
-    <input type="date" name="datum" required><br>
-
-    <label>Startort:</label><br>
-    <input type="text" name="startort" required><br>
-
-    <label>Anzahl Kilometer:</label><br>
-    <input type="number" name="km" required><br>
-
-    <label>Höhenmeter:</label><br>
-    <input type="number" name="hoehenmeter" required><br>
-
-    <label>Maximale Steigung in Prozent:</label><br>
-    <input type="number" name="steigung" step="0.1" required><br><br>
-
-    <input type="submit" name="Rennen_erstellen" value="Rennen speichern">
-</form>
-<hr />
