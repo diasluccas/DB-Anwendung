@@ -2,12 +2,25 @@
 
 <?php
 session_start();
-include 'db.php';
+
+include_once 'db.php';
+include_once 'funktionen/helper.php';
+
+if (isset($_GET['seite']) && $_GET['seite'] == 'logout') {
+    session_unset();
+    session_destroy();
+
+    header("Location: index.php");
+    exit;
+}
+
+$seite = $_GET['seite'] ?? 'teams';
 ?>
 
 <!DOCTYPE html>
 <html lang="de">
 <head>
+    <meta charset="UTF-8">
     <title>RennHub</title>
 </head>
 <body>
@@ -39,11 +52,10 @@ include 'db.php';
 
 <?php
 
-$seite = $_GET['seite'] ?? 'teams';
-
 switch ($seite) {
 
     case 'teams':
+
         if (isset($_SESSION['login_rv'])) {
             echo "Kein Zugriff!";
             break;
@@ -53,6 +65,7 @@ switch ($seite) {
         break;
 
     case 'rennen':
+
         if (isset($_SESSION['login_tc'])) {
             echo "Kein Zugriff!";
             break;
@@ -61,15 +74,11 @@ switch ($seite) {
         include 'rennen.php';
         break;
 
-    case 'logout':
-        session_unset();
-        session_destroy();
-        header("Location: index.php");
-        exit;
-
     default:
         include 'teams.php';
+        break;
 }
+
 ?>
 
 </body>

@@ -1,98 +1,145 @@
 <!-- LUCCAS DIAS - 2026-05-05 -->
 
-<h4>Trainings hinzufügen</h4>
-
 <?php
 
+if (!isset($_SESSION['login_tc'])) {
+    echo "Bitte zuerst als Teamchef einloggen.";
+    exit;
+}
+
 $login = $_SESSION['login_tc'];
+$meldungTraining = "";
 
-$sql = "
-SELECT F.MitarbeiterID, F.Nachname
-FROM Fahrer F
-WHERE F.TCLoginName = '$login'
+if (isset($_POST['add_training'])) {
+
+    $fahrer = trim($_POST['mitarbeiter_id']);
+    $datum = trim($_POST['datum']);
+    $km = trim($_POST['km']);
+    $ziel = trim($_POST['ziel']);
+
+    if ($fahrer == "" || $datum == "" || $km == "" || $ziel == "") {
+        $meldungTraining = "Bitte alle Felder ausfüllen.";
+    } elseif ($km <= 0) {
+        $meldungTraining = "Die Kilometeranzahl muss größer als 0 sein.";
+    } else {
+
+        $sqlCheck = "
+            SELECT Datum
+            FROM Training
+            WHERE MitarbeiterID = ?
+            AND TCLoginName = ?
+            AND Datum = ?
+            LIMIT 1
+        ";
+
+        $stmtCheck = mysqli_prepare($connection, $sqlCheck);
+        mysqli_stmt_bind_param($stmtCheck, "sss", $fahrer, $login, $datum);
+        mysqli_stmt_execute($stmtCheck);
+        $resultCheck = mysqli_stmt_get_result($stmtCheck);
+
+        if (mysqli_num_rows($resultCheck) > 0) {
+            $meldungTraining = "Für diesen Fahrer existiert an diesem Tag bereits ein Training.";
+        } else {
+
+            $sqlInsert = "
+                INSERT INTO Training (Datum, MitarbeiterID, TCLoginName, Km, Ziel)
+                VALUES (?, ?, ?, ?, ?)
+            ";
+
+            $stmtInsert = mysqli_prepare($connection, $sqlInsert);
+            mysqli_stmt_bind_param($stmtInsert, "sssds", $datum, $fahrer, $login, $km, $ziel);
+
+            if (mysqli_stmt_execute($stmtInsert)) {
+                $meldungTraining = "Training erfolgreich gespeichert.";
+            } else {
+                $meldungTraining = "Fehler beim Speichern des Trainings.";
+            }
+        }
+    }
+}
+
+$sqlFahrer = "
+    SELECT MitarbeiterID, Vorname, Nachname
+    FROM Fahrer
+    WHERE TCLoginName = ?
+    ORDER BY Nachname, Vorname
 ";
 
-$result = mysqli_query($connection, $sql);
+$stmtFahrer = mysqli_prepare($connection, $sqlFahrer);
+mysqli_stmt_bind_param($stmtFahrer, "s", $login);
+mysqli_stmt_execute($stmtFahrer);
+$resultFahrer = mysqli_stmt_get_result($stmtFahrer);
 
-$sql2 = "
-SELECT Ziel 
-FROM Trainingsziel
+$sqlZiele = "
+    SELECT Ziel
+    FROM Trainingsziel
+    ORDER BY Ziel
 ";
 
-$result2 = mysqli_query($connection, $sql2);
+$resultZiele = mysqli_query($connection, $sqlZiele);
+
 ?>
+
+<h4>Trainings hinzufügen</h4>
+
+<?php if ($meldungTraining != ""): ?>
+    <p><b><?= h($meldungTraining) ?></b></p>
+<?php endif; ?>
 
 <form method="POST">
 
     <label>Fahrer auswählen:</label><br>
 
     <select name="mitarbeiter_id" required>
+        <option value="">-- Fahrer auswählen --</option>
 
-        <?php
-        if (mysqli_num_rows($result) == 0) {
-            echo "<option value=''>Keine Fahrer vorhanden</option>";
-        } else {
-            while ($row = mysqli_fetch_assoc($result)) {
-                echo "<option value='{$row['MitarbeiterID']}'>
-                        {$row['MitarbeiterID']} - {$row['Nachname']}
-                      </option>";
-            }
-        }
-        ?>
+        <?php if (mysqli_num_rows($resultFahrer) == 0): ?>
 
-    </select><br><br>
+            <option value="">Keine Fahrer vorhanden</option>
+
+        <?php else: ?>
+
+            <?php while ($row = mysqli_fetch_assoc($resultFahrer)): ?>
+                <option value="<?= h($row['MitarbeiterID']) ?>">
+                    <?= h($row['MitarbeiterID']) ?> - <?= h($row['Nachname']) ?>, <?= h($row['Vorname']) ?>
+                </option>
+            <?php endwhile; ?>
+
+        <?php endif; ?>
+    </select>
+
+    <br><br>
 
     <label>Datum:</label><br>
     <input type="date" name="datum" required><br>
 
     <label>Kilometer:</label><br>
-    <input type="number" name="km" required><br>
+    <input type="number" name="km" step="0.01" min="0.01" required><br>
 
     <label>Ziel:</label><br>
-    <select name="ziel">
-        <?php
-            while ($row = mysqli_fetch_assoc($result2)) {
-                echo "<option value='{$row['Ziel']}'>
-                        {$row['Ziel']}
-                      </option>";
-            }
-        ?>
-    </select><br><br>
+    <select name="ziel" required>
+        <option value="">-- Ziel auswählen --</option>
+
+        <?php if (mysqli_num_rows($resultZiele) == 0): ?>
+
+            <option value="">Keine Trainingsziele vorhanden</option>
+
+        <?php else: ?>
+
+            <?php while ($row = mysqli_fetch_assoc($resultZiele)): ?>
+                <option value="<?= h($row['Ziel']) ?>">
+                    <?= h($row['Ziel']) ?>
+                </option>
+            <?php endwhile; ?>
+
+        <?php endif; ?>
+    </select>
+
+    <br><br>
 
     <input type="submit" name="add_training" value="Speichern">
-    <br><br>
+
 </form>
 
-<?php
-
-if (isset($_POST['add_training'])) {
-
-    $fahrer = $_POST['mitarbeiter_id'];
-    $datum = $_POST['datum'];
-    $km = $_POST['km'];
-    $ziel = $_POST['ziel'];
-
-    $checkDatum = "
-    SELECT * FROM Training 
-    WHERE MitarbeiterID = '$fahrer'
-    AND Datum = '$datum'
-    ";
-
-    $resDatum = mysqli_query($connection, $checkDatum);
-
-    if (mysqli_num_rows($resDatum) > 0) {
-        echo "Für diesen Tag existiert bereits ein Training!";
-        reload();
-    }
-
-    $sqlInsert = "
-    INSERT INTO Training (TCLoginName, MitarbeiterID, Datum, Km, Ziel)
-    VALUES ('$login', '$fahrer', '$datum', '$km', '$ziel')
-    ";
-
-    mysqli_query($connection, $sqlInsert);
-
-    echo "Training erfolgreich gespeichert!";
-}
-?>
-<br><br>
+<br>
+<hr>

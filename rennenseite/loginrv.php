@@ -1,9 +1,5 @@
 <!-- LUCCAS DIAS - 2026-04-28 -->
 
-<?php
-include 'db.php';
-?>
-
 <h4>Hast du bereits ein Konto? Dann melde dich hier unten an.</h4>
 
 <form method="POST">
@@ -20,11 +16,21 @@ include 'db.php';
 
 if (isset($_POST['login_rv'])) {
 
-    $login = $_POST['rvname_login'];
-    $kennwort = $_POST['kennwort_login'];
+    $login = trim($_POST['rvname_login']);
+    $kennwort = trim($_POST['kennwort_login']);
 
-    $sql = "SELECT * FROM Rennveranstalter WHERE RVName = '$login'";
-    $result = mysqli_query($connection, $sql);
+    $sql = "
+        SELECT RVName, Kennwort
+        FROM Rennveranstalter
+        WHERE RVName = ?
+        LIMIT 1
+    ";
+
+    $stmt = mysqli_prepare($connection, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $login);
+    mysqli_stmt_execute($stmt);
+
+    $result = mysqli_stmt_get_result($stmt);
 
     if (mysqli_num_rows($result) == 1) {
 
