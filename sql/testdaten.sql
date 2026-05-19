@@ -1,4 +1,4 @@
--- GRUPPE 12 - Testdaten
+-- GRUPPE 12 - Grundstruktur / gemeinsame Datei
 
 DELETE FROM Training;
 DELETE FROM Teilnahme;

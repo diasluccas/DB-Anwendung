@@ -1,4 +1,4 @@
--- GRUPPE 12 - Tabellenstruktur
+-- GRUPPE 12 - Grundstruktur / gemeinsame Datei
 
 CREATE TABLE TeamChef (
     LoginName VARCHAR(50) PRIMARY KEY,

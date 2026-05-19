@@ -1,5 +1,3 @@
-<!-- LUCCAS DIAS - 2026-04-28 -->
-
 <h4>Hast du bereits ein Konto? Dann melde dich hier unten an.</h4>
 
 <form method="POST">

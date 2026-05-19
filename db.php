@@ -1,3 +1,5 @@
+<!-- GRUPPE 12 - Grundstruktur / gemeinsame Datei -->
+ 
 <?php
 
 $host = "localhost";

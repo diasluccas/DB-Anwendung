@@ -1,5 +1,3 @@
-<!-- LUCCAS DIAS - 2026-04-28 -->
-
 <?php
 include_once 'funktionen/exists.php';
 

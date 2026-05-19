@@ -1,5 +1,5 @@
-<!-- LUCCAS DIAS - 2026-04-28 -->
-
+<!-- GRUPPE 12 - Grundstruktur / gemeinsame Datei -->
+ 
 <?php
 session_start();
 

@@ -1,5 +1,3 @@
-<!-- LUCCAS DIAS - 2026-05-05 -->
-
 <?php
 
 if (!isset($_SESSION['login_tc'])) {

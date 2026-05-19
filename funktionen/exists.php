@@ -1,5 +1,4 @@
 <?php
-// LUCCAS DIAS - 2026-04-28
 
 function exists($connection, $table, $column, $value) {
 
