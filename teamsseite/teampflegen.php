@@ -208,6 +208,8 @@ $resultFahrer = mysqli_stmt_get_result($stmtFahrer);
 
 ?>
 
+<hr>
+
 <h4>Mein Team pflegen</h4>
 
 <?php if ($meldung != ""): ?>
@@ -216,14 +218,10 @@ $resultFahrer = mysqli_stmt_get_result($stmtFahrer);
 
 <form method="POST">
 
-    <h5>Teamdaten</h5>
-
     <label>Teamname:</label><br>
     <input type="text" name="teamname" value="<?= h($aktuellerTeamname) ?>" required>
 
-    <br><br>
-
-    <h5>Fahrer anlegen und ändern</h5>
+    <h5>Meine Fahrer</h5>
 
     <table border="1" cellpadding="5">
         <tr>
@@ -327,5 +325,3 @@ $resultFahrer = mysqli_stmt_get_result($stmtFahrer);
     <input type="submit" name="alles_speichern" value="Speichern">
 
 </form>
-
-<hr>

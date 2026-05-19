@@ -231,8 +231,6 @@ while ($fahrer = mysqli_fetch_assoc($resultFahrer)) {
     <p><b><?= h($meldungAnmeldung) ?></b></p>
 <?php endif; ?>
 
-<h5>Neue Rennanmeldung vorbereiten</h5>
-
 <form method="GET" action="index.php">
     <input type="hidden" name="seite" value="teams">
 
@@ -260,8 +258,6 @@ while ($fahrer = mysqli_fetch_assoc($resultFahrer)) {
 
     <input type="submit" value="Tabelle erzeugen">
 </form>
-
-<hr>
 
 <?php
 $rennID = $_GET['renn_id'] ?? "";
@@ -309,8 +305,6 @@ if ($rennID != "" && $anzahl != "" && $anzahl > 0):
 
     <input type="submit" name="anmeldung_speichern" value="Anmeldung speichern">
 </form>
-
-<hr>
 
 <?php endif; ?>
 

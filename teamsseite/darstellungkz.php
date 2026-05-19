@@ -54,7 +54,7 @@ $bis = $_POST['bis'] ?? "";
 
 </form>
 
-<hr>
+<br>
 
 <?php if (isset($_POST['auswertung_anzeigen'])): ?>
 
@@ -71,8 +71,6 @@ $bis = $_POST['bis'] ?? "";
     mysqli_stmt_execute($stmtFahrer);
     $resultFahrer = mysqli_stmt_get_result($stmtFahrer);
     ?>
-
-    <h5>Auswertung</h5>
 
     <?php if (mysqli_num_rows($resultFahrer) == 0): ?>
 
