@@ -80,7 +80,7 @@ if (isset($_POST['anmeldung_speichern'])) {
         if ($gespeichert > 0) {
             $meldungAnmeldung = $gespeichert . " Fahrer erfolgreich angemeldet.";
         } else {
-            $meldungAnmeldung = "Es wurden keine neuen Fahrer angemeldet.";
+            $meldungAnmeldung = "Es wurden keine neuen Fahrer angemeldet (.";
         }
     }
 }
@@ -269,7 +269,7 @@ $anzahl = $_GET['anzahl'] ?? "";
 
 if ($rennID != "" && $anzahl != "" && $anzahl > 0):
 
-    $zeilen = $anzahl + 5;
+    $zeilen = $anzahl;
 ?>
 
 <h5>Fahrer für Rennen anmelden</h5>
@@ -288,12 +288,12 @@ if ($rennID != "" && $anzahl != "" && $anzahl > 0):
                 <td><?= $i ?></td>
                 <td>
                     <select name="fahrer[]">
-                        <option value="">-- leer --</option>
+                        <option value="">leer</option>
 
                         <?php foreach ($fahrerArray as $fahrer): ?>
                             <option value="<?= h($fahrer['MitarbeiterID']) ?>">
                                 <?= h($fahrer['MitarbeiterID']) ?>
-                                @@@
+                                -
                                 <?= h($fahrer['Nachname']) ?>,
                                 <?= h($fahrer['Vorname']) ?>
                             </option>
