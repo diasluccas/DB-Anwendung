@@ -1,5 +1,36 @@
 <?php
 include 'db.php';
+include 'funktionen/zufallrennid.php';
+
+if (isset($_POST['Rennen_erstellen'])) {
+    $datum = $_POST['datum'];
+    $ort = $_POST['startort'];
+    $km = $_POST['km'];
+    $hoehe = $_POST['hoehenmeter'];
+    $steigung = $_POST['steigung'];
+    $rvname = $_SESSION['login_rv'];
+
+    $heute = date("Y-m-d");
+
+    if ($datum < $heute) {
+        echo "Datum darf nicht in der Vergangenheit liegen";
+    } elseif ($steigung > 100) {
+        echo "Steigung kann nicht über 100% liegen";
+    } elseif ($hoehe > ($km * 1000)) {
+        echo "Höhenmeter können nicht größer als die Gesamtstrecke sein";
+    } else {
+        $neue_id = generiereZufallsID($connection);
+
+        $sql = "INSERT INTO Rennen (RennID, Datum, StartOrt, AnzahlKm, HoehenMeter, MaxSteigung, RVName) 
+                VALUES ('$neue_id', '$datum', '$ort', '$km', '$hoehe', '$steigung', '$rvname')";
+
+        if (mysqli_query($connection, $sql)) {
+            echo "Rennen erfolgreich gespeichert! Vergebene Zufalls-ID: $neue_id";
+        } else {
+            echo mysqli_error($connection);
+        }
+    }
+}
 ?>
 
 <h4>Neues Rennen anlegen</h4>
@@ -22,34 +53,3 @@ include 'db.php';
     <input type="submit" name="Rennen_erstellen" value="Rennen speichern">
 </form>
 <hr />
-
-
-<?php
-if (isset($_POST['Rennen_erstellen'])) {
-    // Daten aus dem Formular holen
-    $datum = $_POST['datum'];
-    $ort = $_POST['startort'];
-    $km = $_POST['km'];
-    $hoehe = $_POST['hoehenmeter'];
-    $steigung = $_POST['steigung'];
-    $rvname = $_SESSION['login_rv']; // Name aus der Session
-
-    // Test: Liegt das Datum in der Vergangenheit?
-    $heute = date("Y-m-d");
-
-    if ($datum < $heute) {
-        echo "Fehler: Das Datum darf nicht in der Vergangenheit liegen!";
-    } else {
-        // SQL-Befehl mit Spaltennamen aus Screenshot: Datum, StartOrt, AnzahlKm, HoehenMeter, MaxSteigung, RVName
-        $sql = "INSERT INTO Rennen (Datum, StartOrt, AnzahlKm, HoehenMeter, MaxSteigung, RVName) 
-                VALUES ('$datum', '$ort', '$km', '$hoehe', '$steigung', '$rvname')";
-
-        if (mysqli_query($connection, $sql)) {
-            echo "Rennen erfolgreich gespeichert!";
-        } else {
-            echo "Fehler: " . mysqli_error($connection);
-        }
-    }
-}
-?>
-
