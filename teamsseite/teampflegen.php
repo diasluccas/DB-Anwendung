@@ -93,13 +93,7 @@ if (isset($_POST['alles_speichern'])) {
                 $meldung = "Diese MitarbeiterID existiert in deinem Team bereits.";
             } else {
 
-                $sqlInsert = "
-                    INSERT INTO Fahrer (
-                        MitarbeiterID, TCLoginName, Vorname, Nachname,
-                        Strasse, Hausnummer, PLZ, Ort, TelNr
-                    )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ";
+                $sqlInsert = "CALL sp_fahrer_speichern(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 $stmtInsert = mysqli_prepare($connection, $sqlInsert);
                 mysqli_stmt_bind_param(
@@ -151,32 +145,21 @@ if (isset($_POST['alles_speichern'])) {
 
                 if ($vorname != "" && $nachname != "") {
 
-                    $sqlUpdate = "
-                        UPDATE Fahrer
-                        SET Vorname = ?,
-                            Nachname = ?,
-                            Strasse = ?,
-                            Hausnummer = ?,
-                            PLZ = ?,
-                            Ort = ?,
-                            TelNr = ?
-                        WHERE MitarbeiterID = ?
-                        AND TCLoginName = ?
-                    ";
+                    $sqlUpdate = "CALL sp_fahrer_speichern(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                     $stmtUpdate = mysqli_prepare($connection, $sqlUpdate);
                     mysqli_stmt_bind_param(
                         $stmtUpdate,
                         "sssssssss",
+                        $mitarbeiterID,
+                        $login,
                         $vorname,
                         $nachname,
                         $strasse,
                         $hausnummer,
                         $plz,
                         $ort,
-                        $telnr,
-                        $mitarbeiterID,
-                        $login
+                        $telnr
                     );
 
                     mysqli_stmt_execute($stmtUpdate);
@@ -189,10 +172,6 @@ if (isset($_POST['alles_speichern'])) {
         $meldung = "Änderungen wurden gespeichert.";
     }
 }
-
-/* -------------------------------------------------------
-   Fahrerliste neu laden
-------------------------------------------------------- */
 
 $sqlFahrer = "
     SELECT *

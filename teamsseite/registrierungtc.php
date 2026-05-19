@@ -5,34 +5,25 @@ include_once 'funktionen/exists.php';
 
 function neuesTeamEintragen($connection, $login, $vorname, $nachname, $kennwort, $teamname) {
 
-    mysqli_begin_transaction($connection);
+    $sql = "CALL sp_team_registrieren(?, ?, ?, ?, ?)";
 
-    try {
-        $sql1 = "
-            INSERT INTO TeamChef (LoginName, Vorname, Nachname, Kennwort)
-            VALUES (?, ?, ?, ?)
-        ";
+    $stmt = mysqli_prepare($connection, $sql);
 
-        $stmt1 = mysqli_prepare($connection, $sql1);
-        mysqli_stmt_bind_param($stmt1, "ssss", $login, $vorname, $nachname, $kennwort);
-        mysqli_stmt_execute($stmt1);
-
-        $sql2 = "
-            INSERT INTO Team (TeamName, TCLoginName)
-            VALUES (?, ?)
-        ";
-
-        $stmt2 = mysqli_prepare($connection, $sql2);
-        mysqli_stmt_bind_param($stmt2, "ss", $teamname, $login);
-        mysqli_stmt_execute($stmt2);
-
-        mysqli_commit($connection);
-        return true;
-
-    } catch (Exception $e) {
-        mysqli_rollback($connection);
+    if (!$stmt) {
         return false;
     }
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        "sssss",
+        $login,
+        $vorname,
+        $nachname,
+        $kennwort,
+        $teamname
+    );
+
+    return mysqli_stmt_execute($stmt);
 }
 ?>
 
@@ -70,17 +61,13 @@ if (isset($_POST['submit_all'])) {
 
     if ($login == "" || $vorname == "" || $nachname == "" || $kennwort == "" || $teamname == "") {
         echo "Bitte alle Pflichtfelder ausfüllen!";
-    } elseif (exists($connection, "TeamChef", "LoginName", $login)) {
-        echo "LoginName existiert schon!";
-    } elseif (exists($connection, "Team", "TeamName", $teamname)) {
-        echo "TeamName existiert schon!";
     } else {
         $erfolg = neuesTeamEintragen($connection, $login, $vorname, $nachname, $kennwort, $teamname);
 
         if ($erfolg) {
             echo "Registrierung erfolgreich!";
         } else {
-            echo "Fehler bei der Registrierung!";
+            echo "Fehler bei der Registrierung. LoginName oder TeamName existiert möglicherweise bereits.";
         }
     }
 }

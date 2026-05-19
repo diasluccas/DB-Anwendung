@@ -45,32 +45,18 @@ if (isset($_POST['anmeldung_speichern'])) {
                 continue;
             }
 
-            $sqlStartnummer = "
-                SELECT COALESCE(MAX(Startnummer), 0) + 1 AS naechsteStartnummer
-                FROM Teilnahme
-                WHERE RennID = ?
-            ";
-
-            $stmtStartnummer = mysqli_prepare($connection, $sqlStartnummer);
-            mysqli_stmt_bind_param($stmtStartnummer, "i", $rennID);
-            mysqli_stmt_execute($stmtStartnummer);
-            $resultStartnummer = mysqli_stmt_get_result($stmtStartnummer);
-            $rowStartnummer = mysqli_fetch_assoc($resultStartnummer);
-
-            $startnummer = $rowStartnummer['naechsteStartnummer'];
-
             $sqlInsert = "
                 INSERT INTO Teilnahme (
-                    MitarbeiterID,
-                    TCLoginName,
-                    RennID,
-                    Startnummer
+                MitarbeiterID,
+                TCLoginName,
+                RennID,
+                Startnummer
                 )
-                VALUES (?, ?, ?, ?)
+                VALUES (?, ?, ?, 0)
             ";
 
             $stmtInsert = mysqli_prepare($connection, $sqlInsert);
-            mysqli_stmt_bind_param($stmtInsert, "ssii", $fahrerID, $login, $rennID, $startnummer);
+            mysqli_stmt_bind_param($stmtInsert, "ssi", $fahrerID, $login, $rennID);
 
             if (mysqli_stmt_execute($stmtInsert)) {
                 $gespeichert++;
@@ -133,32 +119,18 @@ if (isset($_POST['copy_speichern'])) {
                 continue;
             }
 
-            $sqlStartnummerCopy = "
-                SELECT COALESCE(MAX(Startnummer), 0) + 1 AS naechsteStartnummer
-                FROM Teilnahme
-                WHERE RennID = ?
-            ";
-
-            $stmtStartnummerCopy = mysqli_prepare($connection, $sqlStartnummerCopy);
-            mysqli_stmt_bind_param($stmtStartnummerCopy, "i", $neuesRennen);
-            mysqli_stmt_execute($stmtStartnummerCopy);
-            $resultStartnummerCopy = mysqli_stmt_get_result($stmtStartnummerCopy);
-            $rowStartnummerCopy = mysqli_fetch_assoc($resultStartnummerCopy);
-
-            $startnummer = $rowStartnummerCopy['naechsteStartnummer'];
-
             $sqlInsertCopy = "
                 INSERT INTO Teilnahme (
-                    MitarbeiterID,
-                    TCLoginName,
-                    RennID,
-                    Startnummer
+                MitarbeiterID,
+                TCLoginName,
+                RennID,
+                Startnummer
                 )
-                VALUES (?, ?, ?, ?)
+                VALUES (?, ?, ?, 0)
             ";
 
             $stmtInsertCopy = mysqli_prepare($connection, $sqlInsertCopy);
-            mysqli_stmt_bind_param($stmtInsertCopy, "ssii", $fahrerID, $login, $neuesRennen, $startnummer);
+            mysqli_stmt_bind_param($stmtInsertCopy, "ssi", $fahrerID, $login, $neuesRennen);
 
             if (mysqli_stmt_execute($stmtInsertCopy)) {
                 $kopiert++;
