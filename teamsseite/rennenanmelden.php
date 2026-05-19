@@ -66,7 +66,7 @@ if (isset($_POST['anmeldung_speichern'])) {
         if ($gespeichert > 0) {
             $meldungAnmeldung = $gespeichert . " Fahrer erfolgreich angemeldet.";
         } else {
-            $meldungAnmeldung = "Es wurden keine neuen Fahrer angemeldet (.";
+            $meldungAnmeldung = "Es wurden keine neuen Fahrer angemeldet.";
         }
     }
 }
@@ -208,7 +208,7 @@ while ($fahrer = mysqli_fetch_assoc($resultFahrer)) {
 
     <label>Rennen auswählen:</label><br>
     <select name="renn_id" required>
-        <option value="">-- Rennen auswählen --</option>
+        <option value="">Rennen auswählen</option>
 
         <?php while ($rennen = mysqli_fetch_assoc($resultRennen)): ?>
             <option value="<?= h($rennen['RennID']) ?>"
@@ -286,7 +286,7 @@ if ($rennID != "" && $anzahl != "" && $anzahl > 0):
 
     <label>Von Rennen kopieren:</label><br>
     <select name="altes_rennen" required>
-        <option value="">-- Quellrennen auswählen --</option>
+        <option value="">Quellrennen auswählen</option>
 
         <?php while ($altes = mysqli_fetch_assoc($resultAlteRennen)): ?>
             <option value="<?= h($altes['RennID']) ?>">
@@ -301,7 +301,7 @@ if ($rennID != "" && $anzahl != "" && $anzahl > 0):
 
     <label>In zukünftiges Rennen kopieren:</label><br>
     <select name="neues_rennen" required>
-        <option value="">-- Zielrennen auswählen --</option>
+        <option value="">Zielrennen auswählen</option>
 
         <?php while ($neues = mysqli_fetch_assoc($resultRennenCopy)): ?>
             <option value="<?= h($neues['RennID']) ?>">

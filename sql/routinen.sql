@@ -9,6 +9,7 @@
    ============================================================ */
 
 DELIMITER //
+DROP PROCEDURE IF EXISTS sp_team_registrieren;//
 
 CREATE PROCEDURE sp_team_registrieren(
     IN p_loginname VARCHAR(50),
@@ -90,6 +91,8 @@ DELIMITER ;
 
 DELIMITER //
 
+DROP PROCEDURE IF EXISTS sp_fahrer_speichern;//
+
 CREATE PROCEDURE sp_fahrer_speichern(
     IN p_mitarbeiter_id VARCHAR(10),
     IN p_tc_loginname VARCHAR(50),
@@ -162,6 +165,8 @@ DELIMITER ;
    ============================================================ */
 
 DELIMITER //
+
+DROP TRIGGER IF EXISTS trg_startnummer_vergeben;//
 
 CREATE TRIGGER trg_startnummer_vergeben
 BEFORE INSERT ON Teilnahme

@@ -95,13 +95,11 @@ $rennen_liste = mysqli_stmt_get_result($stmtRennen);
     <p><b><?= h($meldungErgebnisse) ?></b></p>
 <?php endif; ?>
 
-<h5>Rennen auswählen</h5>
-
 <form method="GET" action="index.php">
     <input type="hidden" name="seite" value="rennen">
 
     <select name="auswahl_id" onchange="this.form.submit()">
-        <option value="">-- Rennen wählen --</option>
+        <option value="">Rennen wählen</option>
 
         <?php while ($row = mysqli_fetch_assoc($rennen_liste)): ?>
             <option value="<?= h($row['RennID']) ?>"
@@ -113,8 +111,6 @@ $rennen_liste = mysqli_stmt_get_result($stmtRennen);
         <?php endwhile; ?>
     </select>
 </form>
-
-<hr>
 
 <?php if ($auswahl_id != ""): ?>
 

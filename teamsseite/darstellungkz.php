@@ -1,5 +1,5 @@
 <?php
-include_once 'klassen/fahrerauswertung.php';
+include_once 'funktionen/fahrerauswertung.php';
 
 if (!isset($_SESSION['login_tc'])) {
     echo "Bitte zuerst als Teamchef einloggen.";

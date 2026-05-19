@@ -91,7 +91,7 @@ $resultZiele = mysqli_query($connection, $sqlZiele);
     <label>Fahrer auswählen:</label><br>
 
     <select name="mitarbeiter_id" required>
-        <option value="">-- Fahrer auswählen --</option>
+        <option value="">Fahrer auswählen</option>
 
         <?php if (mysqli_num_rows($resultFahrer) == 0): ?>
 
@@ -118,7 +118,7 @@ $resultZiele = mysqli_query($connection, $sqlZiele);
 
     <label>Ziel:</label><br>
     <select name="ziel" required>
-        <option value="">-- Ziel auswählen --</option>
+        <option value="">Ziel auswählen</option>
 
         <?php if (mysqli_num_rows($resultZiele) == 0): ?>
 

@@ -62,6 +62,8 @@ if (isset($_POST['Rennen_erstellen'])) {
 }
 ?>
 
+<hr>
+
 <h4>Neues Rennen anlegen</h4>
 
 <form method="POST">
