@@ -110,8 +110,6 @@ class FahrerAuswertung {
             $minimum = min($werteMonat);
             $maximum = max($werteMonat);
             $median = $this->berechneMedian($werteMonat);
-            $quantil25 = $this->berechneQuantil($werteMonat, 0.25);
-            $quantil75 = $this->berechneQuantil($werteMonat, 0.75);
             $standardabweichung = $this->berechneStandardabweichung($werteMonat, $durchschnitt);
 
             $this->daten[$monat] = [
@@ -121,8 +119,6 @@ class FahrerAuswertung {
                 "minimum" => $minimum,
                 "maximum" => $maximum,
                 "median" => $median,
-                "quantil25" => $quantil25,
-                "quantil75" => $quantil75,
                 "standardabweichung" => $standardabweichung
             ];
         }
@@ -145,29 +141,6 @@ class FahrerAuswertung {
         } else {
             return $werte[$mitte];
         }
-    }
-
-    private function berechneQuantil($werte, $q) {
-
-        $anzahl = count($werte);
-
-        if ($anzahl == 0) {
-            return 0;
-        }
-
-        sort($werte);
-
-        $position = ($anzahl - 1) * $q;
-        $unten = floor($position);
-        $oben = ceil($position);
-
-        if ($unten == $oben) {
-            return $werte[$unten];
-        }
-
-        $anteil = $position - $unten;
-
-        return $werte[$unten] * (1 - $anteil) + $werte[$oben] * $anteil;
     }
 
     private function berechneStandardabweichung($werte, $durchschnitt) {

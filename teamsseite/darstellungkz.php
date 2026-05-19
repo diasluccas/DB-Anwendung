@@ -92,8 +92,6 @@ $bis = $_POST['bis'] ?? "";
                 <th>Minimum km</th>
                 <th>Maximum km</th>
                 <th>Median km</th>
-                <th>25%-Quantil</th>
-                <th>75%-Quantil</th>
                 <th>Standardabweichung</th>
             </tr>
 
@@ -132,8 +130,6 @@ $bis = $_POST['bis'] ?? "";
                         <td><?= number_format($werte['minimum'], 2, ',', '.') ?></td>
                         <td><?= number_format($werte['maximum'], 2, ',', '.') ?></td>
                         <td><?= number_format($werte['median'], 2, ',', '.') ?></td>
-                        <td><?= number_format($werte['quantil25'], 2, ',', '.') ?></td>
-                        <td><?= number_format($werte['quantil75'], 2, ',', '.') ?></td>
                         <td><?= number_format($werte['standardabweichung'], 2, ',', '.') ?></td>
                     </tr>
 
