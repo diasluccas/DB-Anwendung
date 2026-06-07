@@ -1,12 +1,13 @@
 -- GRUPPE 12 - Stored Procedures und Trigger
 
-/* ============================================================
-   Stored Procedure: Team registrieren
-   Zweck:
-   - Prüft, ob LoginName bereits existiert
-   - Prüft, ob TeamName bereits existiert
-   - Legt TeamChef und Team gemeinsam in einer Transaktion an
-   ============================================================ */
+/* 
+    Deniz
+    Stored Procedure: Team registrieren
+    Zweck:
+    - Prüft, ob LoginName bereits existiert
+    - Prüft, ob TeamName bereits existiert
+    - Legt TeamChef und Team gemeinsam in einer Transaktion an
+ */
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS sp_team_registrieren;//
@@ -81,13 +82,14 @@ END//
 
 DELIMITER ;
 
-/* ============================================================
-   Stored Procedure: Fahrer speichern oder ändern
-   Zweck:
-   - Wenn Fahrer noch nicht existiert: INSERT
-   - Wenn Fahrer existiert: UPDATE
-   - Die MitarbeiterID wird beim UPDATE nicht geändert
-   ============================================================ */
+/* 
+    Felix
+    Stored Procedure: Fahrer speichern oder ändern
+    Zweck:
+    - Wenn Fahrer noch nicht existiert: INSERT
+    - Wenn Fahrer existiert: UPDATE
+    - Die MitarbeiterID wird beim UPDATE nicht geändert
+ */
 
 DELIMITER //
 
@@ -156,13 +158,14 @@ END//
 
 DELIMITER ;
 
-/* ============================================================
-   Trigger: Startnummer automatisch vergeben
-   Zweck:
-   - Wird vor jedem INSERT in Teilnahme ausgeführt
-   - Wenn Startnummer NULL oder 0 ist, wird automatisch die nächste Startnummer vergeben
-   - Die Startnummer beginnt pro Rennen bei 1
-   ============================================================ */
+/* 
+    Luccas Dias
+    Trigger: Startnummer automatisch vergeben
+    Zweck:
+    - Wird vor jedem INSERT in Teilnahme ausgeführt
+    - Wenn Startnummer NULL oder 0 ist, wird automatisch die nächste Startnummer vergeben
+    - Die Startnummer beginnt pro Rennen bei 1
+*/
 
 DELIMITER //
 

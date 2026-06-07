@@ -1,3 +1,5 @@
+<!-- Luccas Dias -->
+
 <?php
 
 if (!isset($_SESSION['login_tc'])) {

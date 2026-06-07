@@ -1,3 +1,5 @@
+<!-- Deniz -->
+
 <?php
 
 function exists($connection, $table, $column, $value) {
