@@ -1,9 +1,12 @@
-<!-- Luccas Dias -->
+<!-- Luccas Dias
+    Klasse zur Berechnung monatlicher Trainingskennzahlen eines Fahrers
+-->
 
 <?php
 
 class FahrerAuswertung {
 
+    // Verbindungs- und Filterdaten der Auswertung
     private $connection;
     private $mitarbeiterID;
     private $tcLoginName;
@@ -11,8 +14,10 @@ class FahrerAuswertung {
     private $von;
     private $bis;
 
+    // Ergebnisarray mit Kennzahlen pro Monat
     private $daten = [];
 
+    // Konstruktor setzt Fahrer und Datenbankverbindung
     public function __construct($connection, $mitarbeiterID, $tcLoginName) {
         $this->connection = $connection;
         $this->mitarbeiterID = $mitarbeiterID;
@@ -22,28 +27,26 @@ class FahrerAuswertung {
         $this->bis = null;
     }
 
+    // Getter und Setter für Fahrer- und Filterdaten
     public function setFahrer($mitarbeiterID, $tcLoginName) {
         $this->mitarbeiterID = $mitarbeiterID;
         $this->tcLoginName = $tcLoginName;
     }
-
     public function setZeitraum($von, $bis) {
         $this->von = $von;
         $this->bis = $bis;
     }
-
     public function setZiel($ziel) {
         $this->ziel = $ziel;
     }
-
     public function getDaten() {
         return $this->daten;
     }
-
     public function getMonat($monat) {
         return $this->daten[$monat] ?? null;
     }
 
+    // Trainingsdaten laden und Kennzahlen berechnen
     public function berechne() {
 
         $this->daten = [];
@@ -89,8 +92,8 @@ class FahrerAuswertung {
 
         $result = mysqli_stmt_get_result($stmt);
 
+        // Kilometerwerte nach Monat sammeln
         $temp = [];
-
         while ($row = mysqli_fetch_assoc($result)) {
             $monat = $row['monat'];
             $km = floatval($row['Km']);
@@ -102,6 +105,7 @@ class FahrerAuswertung {
             $temp[$monat][] = $km;
         }
 
+        // Kennzahlen je Monat berechnen
         foreach ($temp as $monat => $werteMonat) {
 
             sort($werteMonat);
@@ -126,6 +130,7 @@ class FahrerAuswertung {
         }
     }
 
+    // Median berechnen
     private function berechneMedian($werte) {
 
         $anzahl = count($werte);
@@ -145,6 +150,7 @@ class FahrerAuswertung {
         }
     }
 
+    // Standardabweichung berechnen
     private function berechneStandardabweichung($werte, $durchschnitt) {
 
         $anzahl = count($werte);

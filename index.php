@@ -1,11 +1,14 @@
-<!-- GRUPPE 12 - Grundstruktur / gemeinsame Datei -->
- 
+<!-- GRUPPE 12 - Grundstruktur / gemeinsame Datei
+    Startseite mit Navigation, Sessionsteuerung und Einbindung der Teilseiten
+-->
+
 <?php
 session_start();
 
 include_once 'db.php';
 include_once 'funktionen/helper.php';
 
+// Logout durchführen und Session beenden
 if (isset($_GET['seite']) && $_GET['seite'] == 'logout') {
     session_unset();
     session_destroy();
@@ -14,6 +17,7 @@ if (isset($_GET['seite']) && $_GET['seite'] == 'logout') {
     exit;
 }
 
+// Gewünschte Seite aus der URL lesen, Standardseite ist Teams
 $seite = $_GET['seite'] ?? 'teams';
 ?>
 
@@ -29,6 +33,7 @@ $seite = $_GET['seite'] ?? 'teams';
 
 <hr>
 
+<!-- Navigation abhängig vom Loginstatus anzeigen -->
 <?php if (!isset($_SESSION['login_tc']) && !isset($_SESSION['login_rv'])): ?>
 
     <a href="index.php?seite=teams">Teams</a> |
@@ -52,6 +57,7 @@ $seite = $_GET['seite'] ?? 'teams';
 
 <?php
 
+// Passende Teilseite laden und Zugriff je Rolle prüfen
 switch ($seite) {
 
     case 'teams':

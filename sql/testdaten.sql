@@ -1,4 +1,5 @@
 -- GRUPPE 12 - Grundstruktur / gemeinsame Datei
+-- Testdaten zum Prüfen der wichtigsten Funktionen der Anwendung
 
 DELETE FROM Training;
 DELETE FROM Teilnahme;

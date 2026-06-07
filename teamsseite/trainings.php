@@ -1,7 +1,10 @@
-<!-- Luccas Dias -->
+<!-- LUCCAS DIAS
+    Trainings erfassen für Fahrer des eingeloggten Teamchefs
+-->
 
 <?php
 
+// Zugriff nur für eingeloggte Teamchefs
 if (!isset($_SESSION['login_tc'])) {
     echo "Bitte zuerst als Teamchef einloggen.";
     exit;
@@ -10,6 +13,7 @@ if (!isset($_SESSION['login_tc'])) {
 $login = $_SESSION['login_tc'];
 $meldungTraining = "";
 
+// Formulardaten auslesen und prüfen
 if (isset($_POST['add_training'])) {
 
     $fahrer = trim($_POST['mitarbeiter_id']);
@@ -23,6 +27,7 @@ if (isset($_POST['add_training'])) {
         $meldungTraining = "Die Kilometeranzahl muss größer als 0 sein.";
     } else {
 
+        // Prüfen, ob für diesen Fahrer an diesem Datum bereits ein Training existiert
         $sqlCheck = "
             SELECT Datum
             FROM Training
@@ -41,6 +46,7 @@ if (isset($_POST['add_training'])) {
             $meldungTraining = "Für diesen Fahrer existiert an diesem Tag bereits ein Training.";
         } else {
 
+            // Neues Training speichern
             $sqlInsert = "
                 INSERT INTO Training (Datum, MitarbeiterID, TCLoginName, Km, Ziel)
                 VALUES (?, ?, ?, ?, ?)
@@ -58,6 +64,7 @@ if (isset($_POST['add_training'])) {
     }
 }
 
+// Fahrer des eingeloggten Teamchefs laden
 $sqlFahrer = "
     SELECT MitarbeiterID, Vorname, Nachname
     FROM Fahrer
@@ -86,6 +93,7 @@ $resultZiele = mysqli_query($connection, $sqlZiele);
     <p><b><?= h($meldungTraining) ?></b></p>
 <?php endif; ?>
 
+<!-- Formular zum Erfassen eines neuen Trainings -->
 <form method="POST">
 
     <label>Fahrer auswählen:</label><br>

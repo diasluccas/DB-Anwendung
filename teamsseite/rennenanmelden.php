@@ -1,7 +1,10 @@
-<!-- Luccas Dias -->
+<!-- Luccas Dias
+     Fahrer zu Rennen anmelden und bestehende Anmeldungen kopieren
+-->
 
 <?php
 
+// Zugriff nur für eingeloggte Teamchefs
 if (!isset($_SESSION['login_tc'])) {
     echo "Bitte zuerst als Teamchef einloggen.";
     exit;
@@ -10,6 +13,7 @@ if (!isset($_SESSION['login_tc'])) {
 $login = $_SESSION['login_tc'];
 $meldungAnmeldung = "";
 
+// Anmeldung ausgewählter Fahrer speichern
 if (isset($_POST['anmeldung_speichern'])) {
 
     $rennID = trim($_POST['renn_id']);
@@ -29,6 +33,7 @@ if (isset($_POST['anmeldung_speichern'])) {
                 continue;
             }
 
+            // Prüfen, ob der Fahrer bereits für dieses Rennen angemeldet ist
             $sqlCheck = "
                 SELECT MitarbeiterID
                 FROM Teilnahme
@@ -47,6 +52,7 @@ if (isset($_POST['anmeldung_speichern'])) {
                 continue;
             }
 
+            // Teilnahme speichern, Startnummer wird durch den Trigger vergeben
             $sqlInsert = "
                 INSERT INTO Teilnahme (
                 MitarbeiterID,
@@ -66,13 +72,14 @@ if (isset($_POST['anmeldung_speichern'])) {
         }
 
         if ($gespeichert > 0) {
-            $meldungAnmeldung = $gespeichert . " Fahrer erfolgreich angemeldet.";
+            $meldungAnmeldung = $gespeichert . "Fahrer erfolgreich angemeldet.";
         } else {
             $meldungAnmeldung = "Es wurden keine neuen Fahrer angemeldet.";
         }
     }
 }
 
+// Bestehende Anmeldungen von einem Rennen auf ein anderes kopieren
 if (isset($_POST['copy_speichern'])) {
 
     $altesRennen = trim($_POST['altes_rennen']);
@@ -84,6 +91,7 @@ if (isset($_POST['copy_speichern'])) {
         $meldungAnmeldung = "Quellrennen und Zielrennen dürfen nicht identisch sein.";
     } else {
 
+        // Fahrer des Quellrennens laden
         $sqlAlteFahrer = "
             SELECT MitarbeiterID
             FROM Teilnahme
@@ -103,6 +111,7 @@ if (isset($_POST['copy_speichern'])) {
 
             $fahrerID = $row['MitarbeiterID'];
 
+            // Prüfen, ob der Fahrer im Zielrennen bereits angemeldet ist
             $sqlCheckCopy = "
                 SELECT MitarbeiterID
                 FROM Teilnahme
@@ -121,6 +130,7 @@ if (isset($_POST['copy_speichern'])) {
                 continue;
             }
 
+            // Kopierte Teilnahme speichern, Startnummer kommt vom Trigger
             $sqlInsertCopy = "
                 INSERT INTO Teilnahme (
                 MitarbeiterID,
@@ -149,6 +159,7 @@ if (isset($_POST['copy_speichern'])) {
 
 $heute = date("Y-m-d");
 
+// Nur zukünftige Rennen für neue Anmeldungen laden
 $sqlRennen = "
     SELECT RennID, Datum, StartOrt
     FROM Rennen
@@ -166,6 +177,7 @@ mysqli_stmt_bind_param($stmtRennenCopy, "s", $heute);
 mysqli_stmt_execute($stmtRennenCopy);
 $resultRennenCopy = mysqli_stmt_get_result($stmtRennenCopy);
 
+// Rennen laden, bei denen bereits Fahrer dieses Teamchefs angemeldet sind
 $sqlAlteRennen = "
     SELECT DISTINCT R.RennID, R.Datum, R.StartOrt
     FROM Rennen R
@@ -179,6 +191,7 @@ mysqli_stmt_bind_param($stmtAlteRennen, "s", $login);
 mysqli_stmt_execute($stmtAlteRennen);
 $resultAlteRennen = mysqli_stmt_get_result($stmtAlteRennen);
 
+// Eigene Fahrer für die Auswahlfelder laden
 $sqlFahrer = "
     SELECT MitarbeiterID, Vorname, Nachname
     FROM Fahrer
@@ -205,6 +218,7 @@ while ($fahrer = mysqli_fetch_assoc($resultFahrer)) {
     <p><b><?= h($meldungAnmeldung) ?></b></p>
 <?php endif; ?>
 
+<!-- Formular zur Auswahl von Rennen und Anzahl der Fahrer -->
 <form method="GET" action="index.php">
     <input type="hidden" name="seite" value="teams">
 
@@ -244,6 +258,7 @@ if ($rennID != "" && $anzahl != "" && $anzahl > 0):
 
 <h5>Fahrer für Rennen anmelden</h5>
 
+<!-- Tabelle zur Anmeldung der Fahrer -->
 <form method="POST">
     <input type="hidden" name="renn_id" value="<?= h($rennID) ?>">
 
@@ -284,6 +299,7 @@ if ($rennID != "" && $anzahl != "" && $anzahl > 0):
 
 <h5>Anmeldungen von einem Rennen kopieren</h5>
 
+<!-- Formular zum Kopieren bestehender Anmeldungen -->
 <form method="POST">
 
     <label>Von Rennen kopieren:</label><br>

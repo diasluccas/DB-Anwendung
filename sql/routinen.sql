@@ -1,5 +1,6 @@
 -- GRUPPE 12 - Stored Procedures und Trigger
 
+
 /* 
     Deniz
     Stored Procedure: Team registrieren
@@ -82,6 +83,7 @@ END//
 
 DELIMITER ;
 
+
 /* 
     Felix
     Stored Procedure: Fahrer speichern oder ändern
@@ -158,6 +160,7 @@ END//
 
 DELIMITER ;
 
+
 /* 
     Luccas Dias
     Trigger: Startnummer automatisch vergeben
@@ -179,11 +182,13 @@ BEGIN
 
     IF NEW.Startnummer IS NULL OR NEW.Startnummer = 0 THEN
 
+        -- Nächste freie Startnummer für dieses Rennen ermitteln
         SELECT COALESCE(MAX(Startnummer), 0) + 1
         INTO v_naechste_startnummer
         FROM Teilnahme
         WHERE RennID = NEW.RennID;
 
+                -- Startnummer im neuen Teilnahme-Datensatz setzen
         SET NEW.Startnummer = v_naechste_startnummer;
 
     END IF;

@@ -1,8 +1,11 @@
-<!-- Luccas Dias -->
+<!-- Luccas Dias
+    Auswertung der Trainingskennzahlen pro Fahrer und Monat
+-->
 
 <?php
 include_once 'funktionen/fahrerauswertung.php';
 
+// Zugriff nur für eingeloggte Teamchefs
 if (!isset($_SESSION['login_tc'])) {
     echo "Bitte zuerst als Teamchef einloggen.";
     exit;
@@ -10,6 +13,7 @@ if (!isset($_SESSION['login_tc'])) {
 
 $login = $_SESSION['login_tc'];
 
+// Filterwerte aus dem Formular
 $zielFilter = $_POST['ziel'] ?? "alle";
 $von = $_POST['von'] ?? "";
 $bis = $_POST['bis'] ?? "";
@@ -18,6 +22,7 @@ $bis = $_POST['bis'] ?? "";
 
 <h4>Darstellung Kennzahlen</h4>
 
+<!-- Formular zur Auswahl von Ziel und Zeitraum -->
 <form method="POST">
 
     <label>Trainingsziel:</label><br>
@@ -58,6 +63,7 @@ $bis = $_POST['bis'] ?? "";
 
 <br>
 
+<!-- Auswertung erst nach Absenden des Formulars anzeigen -->
 <?php if (isset($_POST['auswertung_anzeigen'])): ?>
 
     <?php
@@ -96,8 +102,10 @@ $bis = $_POST['bis'] ?? "";
             </tr>
 
             <?php while ($fahrer = mysqli_fetch_assoc($resultFahrer)): ?>
-
+                
                 <?php
+                // Auswertung für den aktuellen Fahrer berechnen
+
                 $auswertung = new FahrerAuswertung(
                     $connection,
                     $fahrer['MitarbeiterID'],
@@ -114,6 +122,7 @@ $bis = $_POST['bis'] ?? "";
                 $daten = $auswertung->getDaten();
                 ?>
 
+                <!-- Berechnete Monatswerte ausgeben -->
                 <?php foreach ($daten as $monat => $werte): ?>
                     <?php $hatDaten = true; ?>
 
@@ -139,6 +148,7 @@ $bis = $_POST['bis'] ?? "";
 
         </table>
 
+        <!-- Meldung anzeigen, wenn keine passenden Trainingsdaten existieren -->
         <?php if (!$hatDaten): ?>
             <p>Für die ausgewählten Filter wurden keine Trainingsdaten gefunden.</p>
         <?php endif; ?>
