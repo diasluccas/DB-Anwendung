@@ -1,5 +1,5 @@
-<!-- Luccas Dias
-     Fahrer zu Rennen anmelden und bestehende Anmeldungen kopieren
+<!-- Luccas
+    Fahrer zu Rennen anmelden und bestehende Anmeldungen kopieren
 -->
 
 <?php

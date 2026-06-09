@@ -85,7 +85,7 @@ DELIMITER ;
 
 
 /* 
-    FELIX Weber
+    Deniz
     Stored Procedure: Fahrer speichern oder ändern
     Zweck:
     - Wenn Fahrer noch nicht existiert: INSERT
@@ -165,7 +165,7 @@ DELIMITER ;
 
 
 /* 
-    Luccas Dias
+    Luccas
     Trigger: Startnummer automatisch vergeben
     Zweck:
     - Wird vor jedem INSERT in Teilnahme ausgeführt
@@ -199,8 +199,9 @@ END//
 
 DELIMITER ;
 
+
 /* 
-    FELIX Weber
+    Felix
     Stored Procedure: Rennveranstalter registrieren
     Zweck:
     - Prüft, ob RVName bereits existiert
@@ -209,9 +210,9 @@ DELIMITER ;
 
 DELIMITER //
 
-DROP PROCEDURE IF EXISTS sp_rennveranstalter_registrieren;//
+DROP PROCEDURE IF EXISTS sp_rv_registrieren;//
 
-CREATE PROCEDURE sp_rennveranstalter_registrieren(
+CREATE PROCEDURE sp_rv_registrieren(
     IN p_rvname VARCHAR(50),
     IN p_kennwort VARCHAR(50)
 )

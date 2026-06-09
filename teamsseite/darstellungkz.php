@@ -1,4 +1,4 @@
-<!-- Luccas Dias
+<!-- Luccas
     Auswertung der Trainingskennzahlen pro Fahrer und Monat
 -->
 

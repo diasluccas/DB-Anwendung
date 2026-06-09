@@ -1,13 +1,10 @@
-<!-- Felix Weber -->
+<!-- Felix Weber 
+Datei:  rennenseite/registrierungrv.php
+Zweck:  Registrierung eines neuen Rennveranstalters.
+        Prüfung ob RVName bereits existiert erfolgt über die Stored Procedure sp_rv_registrieren.
+        Bei Fehler wird die Meldung direkt aus der SP ausgelesen und angezeigt. -->
 
 <?php
-/**
- * Autor:  Felix Weber
- * Datei:  rennenseite/registrierungrv.php
- * Zweck:  Registrierung eines neuen Rennveranstalters.
- *         Prüfung ob RVName bereits existiert erfolgt über die Stored Procedure sp_rv_registrieren.
- *         Bei Fehler wird die Meldung direkt aus der SP ausgelesen und angezeigt.
- */
 
 function neuerRennveranstalterEintragen($connection, $rvname, $kennwort) {
 

@@ -1,4 +1,4 @@
-<!-- Autor:  Felix Weber
+<!-- Felix Weber
  Datei:  rennenseite/loginrv.php
  Zweck:  Login für Rennveranstalter. Prüft RVName und Kennwort gegen die Datenbank.
  Bei Erfolg wird der RVName in der Session gespeichert und weitergeleitet. -->

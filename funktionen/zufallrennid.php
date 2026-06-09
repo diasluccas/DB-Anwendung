@@ -1,12 +1,11 @@
-<?php
-/*
-    Felix Weber
+<!-- Felix Weber
     Datei: funktionen/zufallrennid.php
     Zweck:
     - Erzeugt eine zufällige RennID für neue Rennen
     - Prüft, ob die RennID bereits in der Tabelle Rennen existiert
-    - Gibt eine eindeutige vierstellige ID zurück
-*/
+    - Gibt eine eindeutige vierstellige ID zurück -->
+
+<?php
 
 function generiereZufallsID($connection) {
 

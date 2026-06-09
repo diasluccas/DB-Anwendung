@@ -1,4 +1,4 @@
-<!-- Luccas Dias
+<!-- Luccas
     Klasse zur Berechnung monatlicher Trainingskennzahlen eines Fahrers
 -->
 

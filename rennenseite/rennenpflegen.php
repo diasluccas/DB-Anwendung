@@ -1,4 +1,4 @@
- <!-- Autor:  Felix Weber
+ <!-- Felix Weber
  Datei:  rennenseite/rennenpflegen.php
  Zweck:  Neues Rennen anlegen mit Validierung und Datenbankzugriff.
  RennID wird über generiereZufallsID() vergeben.-->
