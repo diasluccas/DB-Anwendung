@@ -20,11 +20,17 @@ if (isset($_POST['add_training'])) {
     $datum = trim($_POST['datum']);
     $km = trim($_POST['km']);
     $ziel = trim($_POST['ziel']);
+    $heute = date("Y-m-d");
 
     if ($fahrer == "" || $datum == "" || $km == "" || $ziel == "") {
         $meldungTraining = "Bitte alle Felder ausfüllen.";
+
     } elseif ($km <= 0) {
         $meldungTraining = "Die Kilometeranzahl muss größer als 0 sein.";
+
+    } elseif ($datum > $heute) {
+        $meldungTraining = "Trainings dürfen nicht in der Zukunft liegen.";
+
     } else {
 
         // Prüfen, ob für diesen Fahrer an diesem Datum bereits ein Training existiert
@@ -55,14 +61,21 @@ if (isset($_POST['add_training'])) {
             $stmtInsert = mysqli_prepare($connection, $sqlInsert);
             mysqli_stmt_bind_param($stmtInsert, "sssds", $datum, $fahrer, $login, $km, $ziel);
 
-            if (mysqli_stmt_execute($stmtInsert)) {
+            try {
 
-                $meldungTraining = "Training erfolgreich gespeichert.";
+                if (mysqli_stmt_execute($stmtInsert)) {
 
-            } else {
+                    $meldungTraining = "Training erfolgreich gespeichert.";
 
-                if (mysqli_stmt_errno($stmtInsert) == 1644) {
-                    $meldungTraining = mysqli_stmt_error($stmtInsert);
+                } else {
+
+                    $meldungTraining = "Fehler beim Speichern des Trainings.";
+                }
+
+            } catch (mysqli_sql_exception $e) {
+
+                if ($e->getCode() == 1644) {
+                    $meldungTraining = $e->getMessage();
                 } else {
                     $meldungTraining = "Fehler beim Speichern des Trainings.";
                 }
