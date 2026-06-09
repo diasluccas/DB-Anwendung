@@ -17,19 +17,30 @@ function neuerRennveranstalterEintragen($connection, $rvname, $kennwort) {
     $stmt = mysqli_prepare($connection, $sql);
 
     if (!$stmt) {
-        return ["erfolg" => false, "meldung" => "Fehler bei der Vorbereitung!"];
+        return [
+            "erfolg" => false,
+            "meldung" => "Fehler bei der Vorbereitung der Registrierung."
+        ];
     }
 
     mysqli_stmt_bind_param($stmt, "ss", $rvname, $kennwort);
 
-    $erfolg = mysqli_stmt_execute($stmt);
+    try {
+    mysqli_stmt_execute($stmt);
 
-    if ($erfolg) {
-        return ["erfolg" => true, "meldung" => "Registrierung erfolgreich!"];
-    } else {
-        // Fehlermeldung direkt aus der SP auslesen
-        return ["erfolg" => false, "meldung" => mysqli_stmt_error($stmt)];
+    return [
+        "erfolg" => true,
+        "meldung" => "Rennveranstalter erfolgreich erstellt!"
+    ];
+
+    } catch (mysqli_sql_exception $e) {
+
+        return [
+            "erfolg" => false,
+            "meldung" => $e->getMessage()
+        ];
     }
+
 }
 ?>
 
@@ -58,7 +69,7 @@ if (isset($_POST['registrierung_rv'])) {
     } else {
         // Funktion aufrufen und Rückmeldung ausgeben
         $result = neuerRennveranstalterEintragen($connection, $rvname, $kennwort);
-        echo $result['meldung'];
+        echo h($result['meldung']);
     }
 }
 ?>
