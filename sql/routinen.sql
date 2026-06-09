@@ -1,10 +1,9 @@
 -- GRUPPE 12 - Stored Procedures und Trigger
 
-
 -- Stored Procedures --
 
 /* 
-    Deniz
+    Deniz Persbach
     Stored Procedure: Team registrieren
     Zweck:
     - Prüft, ob LoginName bereits existiert
@@ -26,12 +25,14 @@ BEGIN
     DECLARE v_login_vorhanden INT DEFAULT 0;
     DECLARE v_team_vorhanden INT DEFAULT 0;
 
+    -- Bei einem Fehler wird alles zurückgesetzt
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
         RESIGNAL;
     END;
 
+    -- Prüfen, ob LoginName oder TeamName schon vergeben sind
     SELECT COUNT(*)
     INTO v_login_vorhanden
     FROM TeamChef
@@ -54,6 +55,7 @@ BEGIN
 
     ELSE
 
+        -- TeamChef und Team werden zusammen gespeichert
         START TRANSACTION;
 
         INSERT INTO TeamChef (
@@ -85,8 +87,9 @@ END//
 
 DELIMITER ;
 
+
 /* 
-    Deniz
+    Deniz Persbach
     Stored Procedure: Fahrer speichern oder ändern
     Zweck:
     - Wenn Fahrer noch nicht existiert: INSERT

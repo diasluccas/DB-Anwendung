@@ -2,14 +2,20 @@
 
 <?php
 
+// Zugriff nur für eingeloggte Teamchefs
 if (!isset($_SESSION['login_tc'])) {
     echo "Bitte zuerst als Teamchef einloggen.";
     exit;
 }
 
+
+// LoginName aus der Session wird für alle Team- und Fahrerabfragen verwendet
 $login = $_SESSION['login_tc'];
 $meldung = "";
 
+
+
+// Aktuellen Teamnamen des eingeloggten Teamchefs laden
 $sqlTeam = "
     SELECT TeamName
     FROM Team
@@ -25,20 +31,27 @@ $team = mysqli_fetch_assoc($resultTeam);
 
 $aktuellerTeamname = $team['TeamName'] ?? "";
 
+
+
+
 if (isset($_POST['alles_speichern'])) {
 
     $neuerTeamname = trim($_POST['teamname']);
 
+    
     if ($neuerTeamname == "") {
         $meldung = "Teamname darf nicht leer sein.";
     } else {
 
+
+        // existiert Teamname schon bei einem anderen Teamchef 
         $sqlCheckTeam = "
             SELECT TeamName
             FROM Team
             WHERE TeamName = ?
             AND TCLoginName <> ?
         ";
+
 
         $stmtCheckTeam = mysqli_prepare($connection, $sqlCheckTeam);
         mysqli_stmt_bind_param($stmtCheckTeam, "ss", $neuerTeamname, $login);
@@ -49,6 +62,7 @@ if (isset($_POST['alles_speichern'])) {
             $meldung = "Dieser Teamname existiert bereits.";
         } else {
 
+            // Teamnamen vom Teamchefs ändern
             $sqlUpdateTeam = "
                 UPDATE Team
                 SET TeamName = ?
@@ -63,6 +77,7 @@ if (isset($_POST['alles_speichern'])) {
         }
     }
 
+    // Eingaben für eine neue Fahrerzeile auslesen
     $neuID = trim($_POST['neu_mitarbeiter_id'] ?? "");
     $neuVorname = trim($_POST['neu_vorname'] ?? "");
     $neuNachname = trim($_POST['neu_nachname'] ?? "");
@@ -72,12 +87,14 @@ if (isset($_POST['alles_speichern'])) {
     $neuOrt = trim($_POST['neu_ort'] ?? "");
     $neuTelNr = trim($_POST['neu_telnr'] ?? "");
 
+    
     if ($neuID != "" || $neuVorname != "" || $neuNachname != "") {
 
         if ($neuID == "" || $neuVorname == "" || $neuNachname == "") {
             $meldung = "Für einen neuen Fahrer müssen MitarbeiterID, Vorname und Nachname ausgefüllt sein.";
         } else {
 
+            // MitarbeiterID darf im eigenen Team nicht doppelt vorkommen
             $sqlCheckFahrer = "
                 SELECT MitarbeiterID
                 FROM Fahrer
@@ -85,6 +102,7 @@ if (isset($_POST['alles_speichern'])) {
                 AND TCLoginName = ?
                 LIMIT 1
             ";
+
 
             $stmtCheckFahrer = mysqli_prepare($connection, $sqlCheckFahrer);
             mysqli_stmt_bind_param($stmtCheckFahrer, "ss", $neuID, $login);
@@ -95,6 +113,7 @@ if (isset($_POST['alles_speichern'])) {
                 $meldung = "Diese MitarbeiterID existiert in deinem Team bereits.";
             } else {
 
+                // Neuen Fahrer über die Stored Procedure speichern
                 $sqlInsert = "CALL sp_fahrer_speichern(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 $stmtInsert = mysqli_prepare($connection, $sqlInsert);
@@ -117,6 +136,8 @@ if (isset($_POST['alles_speichern'])) {
         }
     }
 
+
+    //  Fahrer bearbeiten oder löschen
     if (isset($_POST['fahrer']) && is_array($_POST['fahrer'])) {
 
         foreach ($_POST['fahrer'] as $mitarbeiterID => $daten) {
@@ -125,6 +146,8 @@ if (isset($_POST['alles_speichern'])) {
 
             if (isset($daten['loeschen'])) {
 
+
+                // Fahrer nur aus dem eigenen Team löschen
                 $sqlDelete = "
                     DELETE FROM Fahrer
                     WHERE MitarbeiterID = ?
@@ -133,10 +156,7 @@ if (isset($_POST['alles_speichern'])) {
 
                 $stmtDelete = mysqli_prepare($connection, $sqlDelete);
                 mysqli_stmt_bind_param($stmtDelete, "ss", $mitarbeiterID, $login);
-
-                    if (!mysqli_stmt_execute($stmtDelete)) {
-                        $meldung = "Fehler beim Löschen des Fahrers.";
-                    }
+                mysqli_stmt_execute($stmtDelete);
 
             } else {
 
@@ -148,8 +168,10 @@ if (isset($_POST['alles_speichern'])) {
                 $ort = trim($daten['ort']);
                 $telnr = trim($daten['telnr']);
 
+                
                 if ($vorname != "" && $nachname != "") {
 
+                    // Fahrer über die gleiche Stored Procedure aktualisieren
                     $sqlUpdate = "CALL sp_fahrer_speichern(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                     $stmtUpdate = mysqli_prepare($connection, $sqlUpdate);
@@ -178,6 +200,7 @@ if (isset($_POST['alles_speichern'])) {
     }
 }
 
+// Alle Fahrer des eingeloggten Teamchefs laden
 $sqlFahrer = "
     SELECT *
     FROM Fahrer
@@ -220,6 +243,7 @@ $resultFahrer = mysqli_stmt_get_result($stmtFahrer);
             <th>Löschen</th>
         </tr>
 
+        <!-- Neue Fahrerzeile -->
         <tr>
             <td><input type="text" name="neu_mitarbeiter_id"></td>
             <td><input type="text" name="neu_vorname"></td>
@@ -242,6 +266,7 @@ $resultFahrer = mysqli_stmt_get_result($stmtFahrer);
 
             <?php while ($fahrer = mysqli_fetch_assoc($resultFahrer)): ?>
 
+                <!-- Bestehender Fahrer -->
                 <tr>
                     <td>
                         <?= h($fahrer['MitarbeiterID']) ?>

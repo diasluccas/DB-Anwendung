@@ -1,16 +1,19 @@
 <!-- Deniz -->
 
 <?php
-include_once 'funktionen/exists.php';
 
 function neuesTeamEintragen($connection, $login, $vorname, $nachname, $kennwort, $teamname) {
 
+    // Stored Procedure übernimmt Prüfung und INSERT
     $sql = "CALL sp_team_registrieren(?, ?, ?, ?, ?)";
 
     $stmt = mysqli_prepare($connection, $sql);
 
     if (!$stmt) {
-        return false;
+        return [
+            "erfolg" => false,
+            "meldung" => "Fehler bei der Vorbereitung der Registrierung."
+        ];
     }
 
     mysqli_stmt_bind_param(
@@ -23,7 +26,21 @@ function neuesTeamEintragen($connection, $login, $vorname, $nachname, $kennwort,
         $teamname
     );
 
-    return mysqli_stmt_execute($stmt);
+    try {
+        mysqli_stmt_execute($stmt);
+
+        return [
+            "erfolg" => true,
+            "meldung" => "Teamchef und Team erfolgreich erstellt!"
+        ];
+
+    } catch (mysqli_sql_exception $e) {
+
+        return [
+            "erfolg" => false,
+            "meldung" => $e->getMessage()
+        ];
+    }
 }
 ?>
 
@@ -62,13 +79,10 @@ if (isset($_POST['submit_all'])) {
     if ($login == "" || $vorname == "" || $nachname == "" || $kennwort == "" || $teamname == "") {
         echo "Bitte alle Pflichtfelder ausfüllen!";
     } else {
-        $erfolg = neuesTeamEintragen($connection, $login, $vorname, $nachname, $kennwort, $teamname);
 
-        if ($erfolg) {
-            echo "Registrierung erfolgreich!";
-        } else {
-            echo "Fehler bei der Registrierung. LoginName oder TeamName existiert möglicherweise bereits.";
-        }
+        // Funktion aufrufen und Rückmeldung ausgeben
+        $result = neuesTeamEintragen($connection, $login, $vorname, $nachname, $kennwort, $teamname);
+        echo h($result['meldung']);
     }
 }
 ?>

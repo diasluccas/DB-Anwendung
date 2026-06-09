@@ -14,11 +14,14 @@
 
 <?php
 
+// Login wird verarbeitet, wenn das Formular abgeschickt wurde
 if (isset($_POST['login_tc'])) {
 
+    // Eingaben aus dem Formular holen
     $login = trim($_POST['loginname_login']);
     $kennwort = trim($_POST['kennwort_login']);
 
+    // Teamchef nach LoginNames suchen
     $sql = "
         SELECT LoginName, Kennwort
         FROM TeamChef
@@ -40,6 +43,7 @@ if (isset($_POST['login_tc'])) {
 
             $_SESSION['login_tc'] = $user['LoginName'];
 
+            // Nach erfolgreichem Login zur Teamseite weiterleiten
             header("Location: index.php?seite=teams");
             exit;
 
