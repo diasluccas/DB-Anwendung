@@ -247,47 +247,6 @@ DELIMITER ;
 
 /* 
    Luccas Dias
-   Trigger: Fahrer-Löschung prüfen
-   Zweck:
-   - Verhindert das Löschen von Fahrern mit vorhandenen Trainings
-     oder Rennteilnahmen
-   - Schützt historische Daten vor unbeabsichtigtem Verlust
-*/
-
-DELIMITER //
-
-CREATE TRIGGER trg_fahrer_loeschen_pruefen
-BEFORE DELETE ON Fahrer
-FOR EACH ROW
-BEGIN
-    DECLARE v_trainings INT DEFAULT 0;
-    DECLARE v_teilnahmen INT DEFAULT 0;
-
-    -- Prüfen, ob Trainings für den Fahrer existieren
-    SELECT COUNT(*)
-    INTO v_trainings
-    FROM Training
-    WHERE MitarbeiterID = OLD.MitarbeiterID
-      AND TCLoginName = OLD.TCLoginName;
-
-    -- Prüfen, ob Rennteilnahmen für den Fahrer existieren
-    SELECT COUNT(*)
-    INTO v_teilnahmen
-    FROM Teilnahme
-    WHERE MitarbeiterID = OLD.MitarbeiterID
-      AND TCLoginName = OLD.TCLoginName;
-
-    -- Löschen blockieren, wenn historische Daten vorhanden sind
-    IF v_trainings > 0 OR v_teilnahmen > 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Fahrer mit Trainings oder Rennteilnahmen duerfen nicht geloescht werden.';
-    END IF;
-END//
-
-DELIMITER ;
-
-/* 
-   Luccas Dias
    Trigger: Training prüfen
    Zweck:
    - Prüft Trainingsdaten vor dem Einfügen
