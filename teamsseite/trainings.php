@@ -56,9 +56,16 @@ if (isset($_POST['add_training'])) {
             mysqli_stmt_bind_param($stmtInsert, "sssds", $datum, $fahrer, $login, $km, $ziel);
 
             if (mysqli_stmt_execute($stmtInsert)) {
+
                 $meldungTraining = "Training erfolgreich gespeichert.";
+
             } else {
-                $meldungTraining = "Fehler beim Speichern des Trainings.";
+
+                if (mysqli_stmt_errno($stmtInsert) == 1644) {
+                    $meldungTraining = mysqli_stmt_error($stmtInsert);
+                } else {
+                    $meldungTraining = "Fehler beim Speichern des Trainings.";
+                }
             }
         }
     }

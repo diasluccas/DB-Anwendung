@@ -133,7 +133,15 @@ if (isset($_POST['alles_speichern'])) {
 
                 $stmtDelete = mysqli_prepare($connection, $sqlDelete);
                 mysqli_stmt_bind_param($stmtDelete, "ss", $mitarbeiterID, $login);
-                mysqli_stmt_execute($stmtDelete);
+
+                if (!mysqli_stmt_execute($stmtDelete)) {
+
+                    if (mysqli_stmt_errno($stmtDelete) == 1644) {
+                        $meldung = mysqli_stmt_error($stmtDelete);
+                    } else {
+                        $meldung = "Fehler beim Löschen des Fahrers.";
+                    }
+                }
 
             } else {
 

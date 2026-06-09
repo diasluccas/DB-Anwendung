@@ -1,6 +1,8 @@
 -- GRUPPE 12 - Stored Procedures und Trigger
 
 
+-- Stored Procedures --
+
 /* 
     Deniz
     Stored Procedure: Team registrieren
@@ -83,7 +85,6 @@ END//
 
 DELIMITER ;
 
-
 /* 
     Deniz
     Stored Procedure: Fahrer speichern oder ändern
@@ -163,43 +164,6 @@ END//
 
 DELIMITER ;
 
-
-/* 
-    Luccas
-    Trigger: Startnummer automatisch vergeben
-    Zweck:
-    - Wird vor jedem INSERT in Teilnahme ausgeführt
-    - Wenn Startnummer NULL oder 0 ist, wird automatisch die nächste Startnummer vergeben
-    - Die Startnummer beginnt pro Rennen bei 1
-*/
-
-DELIMITER //
-
-DROP TRIGGER IF EXISTS trg_startnummer_vergeben;//
-
-CREATE TRIGGER trg_startnummer_vergeben
-BEFORE INSERT ON Teilnahme
-FOR EACH ROW
-BEGIN
-    DECLARE v_naechste_startnummer INT DEFAULT 1;
-
-    IF NEW.Startnummer IS NULL OR NEW.Startnummer = 0 THEN
-
-        -- Nächste freie Startnummer für dieses Rennen ermitteln
-        SELECT COALESCE(MAX(Startnummer), 0) + 1
-        INTO v_naechste_startnummer
-        FROM Teilnahme
-        WHERE RennID = NEW.RennID;
-
-                -- Startnummer im neuen Teilnahme-Datensatz setzen
-        SET NEW.Startnummer = v_naechste_startnummer;
-
-    END IF;
-END//
-
-DELIMITER ;
-
-
 /* 
     Felix
     Stored Procedure: Rennveranstalter registrieren
@@ -238,6 +202,143 @@ BEGIN
     ELSE
         INSERT INTO Rennveranstalter (RVName, Kennwort)
         VALUES (p_rvname, p_kennwort);
+    END IF;
+END//
+
+DELIMITER ;
+
+
+-- Triggers --
+
+/* 
+    Luccas
+    Trigger: Startnummer automatisch vergeben
+    Zweck:
+    - Wird vor jedem INSERT in Teilnahme ausgeführt
+    - Wenn Startnummer NULL oder 0 ist, wird automatisch die nächste Startnummer vergeben
+    - Die Startnummer beginnt pro Rennen bei 1
+*/
+
+DELIMITER //
+
+DROP TRIGGER IF EXISTS trg_startnummer_vergeben;//
+
+CREATE TRIGGER trg_startnummer_vergeben
+BEFORE INSERT ON Teilnahme
+FOR EACH ROW
+BEGIN
+    DECLARE v_naechste_startnummer INT DEFAULT 1;
+
+    IF NEW.Startnummer IS NULL OR NEW.Startnummer = 0 THEN
+
+        -- Nächste freie Startnummer für dieses Rennen ermitteln
+        SELECT COALESCE(MAX(Startnummer), 0) + 1
+        INTO v_naechste_startnummer
+        FROM Teilnahme
+        WHERE RennID = NEW.RennID;
+
+                -- Startnummer im neuen Teilnahme-Datensatz setzen
+        SET NEW.Startnummer = v_naechste_startnummer;
+
+    END IF;
+END//
+
+DELIMITER ;
+
+/* 
+   Luccas Dias
+   Trigger: Fahrer-Löschung prüfen
+   Zweck:
+   - Verhindert das Löschen von Fahrern mit vorhandenen Trainings
+     oder Rennteilnahmen
+   - Schützt historische Daten vor unbeabsichtigtem Verlust
+*/
+
+DELIMITER //
+
+CREATE TRIGGER trg_fahrer_loeschen_pruefen
+BEFORE DELETE ON Fahrer
+FOR EACH ROW
+BEGIN
+    DECLARE v_trainings INT DEFAULT 0;
+    DECLARE v_teilnahmen INT DEFAULT 0;
+
+    -- Prüfen, ob Trainings für den Fahrer existieren
+    SELECT COUNT(*)
+    INTO v_trainings
+    FROM Training
+    WHERE MitarbeiterID = OLD.MitarbeiterID
+      AND TCLoginName = OLD.TCLoginName;
+
+    -- Prüfen, ob Rennteilnahmen für den Fahrer existieren
+    SELECT COUNT(*)
+    INTO v_teilnahmen
+    FROM Teilnahme
+    WHERE MitarbeiterID = OLD.MitarbeiterID
+      AND TCLoginName = OLD.TCLoginName;
+
+    -- Löschen blockieren, wenn historische Daten vorhanden sind
+    IF v_trainings > 0 OR v_teilnahmen > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Fahrer mit Trainings oder Rennteilnahmen duerfen nicht geloescht werden.';
+    END IF;
+END//
+
+DELIMITER ;
+
+/* 
+   Luccas Dias
+   Trigger: Training prüfen
+   Zweck:
+   - Prüft Trainingsdaten vor dem Einfügen
+   - Verhindert ungültige Kilometer und zukünftige Trainingsdaten
+   - Unterstützt die Datenqualität für die spätere Auswertung
+*/
+
+DELIMITER //
+
+CREATE TRIGGER trg_training_pruefen
+BEFORE INSERT ON Training
+FOR EACH ROW
+BEGIN
+    DECLARE v_fahrer_vorhanden INT DEFAULT 0;
+    DECLARE v_ziel_vorhanden INT DEFAULT 0;
+
+    -- Prüfen, ob der Fahrer existiert
+    SELECT COUNT(*)
+    INTO v_fahrer_vorhanden
+    FROM Fahrer
+    WHERE MitarbeiterID = NEW.MitarbeiterID
+      AND TCLoginName = NEW.TCLoginName;
+
+    IF v_fahrer_vorhanden = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Der Fahrer existiert nicht.';
+    END IF;
+
+    -- Kilometer müssen positiv sein
+    IF NEW.Km <= 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Die Kilometeranzahl muss groesser als 0 sein.';
+    END IF;
+
+    -- Trainings dürfen nicht in der Zukunft liegen
+    IF NEW.Datum > CURDATE() THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Trainings duerfen nicht in der Zukunft liegen.';
+    END IF;
+
+    IF NEW.Ziel IS NOT NULL THEN
+
+        SELECT COUNT(*)
+        INTO v_ziel_vorhanden
+        FROM Trainingsziel
+        WHERE Ziel = NEW.Ziel;
+
+        IF v_ziel_vorhanden = 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Das Trainingsziel existiert nicht.';
+        END IF;
     END IF;
 END//
 
