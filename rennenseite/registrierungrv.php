@@ -1,24 +1,35 @@
-<!-- Deniz -->
+<!-- Felix Weber -->
 
 <?php
-include_once 'funktionen/exists.php';
+/**
+ * Autor:  Felix Weber
+ * Datei:  rennenseite/registrierungrv.php
+ * Zweck:  Registrierung eines neuen Rennveranstalters.
+ *         Prüfung ob RVName bereits existiert erfolgt über die Stored Procedure sp_rv_registrieren.
+ *         Bei Fehler wird die Meldung direkt aus der SP ausgelesen und angezeigt.
+ */
 
 function neuerRennveranstalterEintragen($connection, $rvname, $kennwort) {
 
-    $sql = "
-        INSERT INTO Rennveranstalter (RVName, Kennwort)
-        VALUES (?, ?)
-    ";
+    // SP übernimmt sowohl Prüfung als auch INSERT
+    $sql = "CALL sp_rv_registrieren(?, ?)";
 
     $stmt = mysqli_prepare($connection, $sql);
 
     if (!$stmt) {
-        return false;
+        return ["erfolg" => false, "meldung" => "Fehler bei der Vorbereitung!"];
     }
 
     mysqli_stmt_bind_param($stmt, "ss", $rvname, $kennwort);
 
-    return mysqli_stmt_execute($stmt);
+    $erfolg = mysqli_stmt_execute($stmt);
+
+    if ($erfolg) {
+        return ["erfolg" => true, "meldung" => "Registrierung erfolgreich!"];
+    } else {
+        // Fehlermeldung direkt aus der SP auslesen
+        return ["erfolg" => false, "meldung" => mysqli_stmt_error($stmt)];
+    }
 }
 ?>
 
@@ -44,16 +55,10 @@ if (isset($_POST['registrierung_rv'])) {
 
     if ($rvname == "" || $kennwort == "") {
         echo "Bitte alle Pflichtfelder ausfüllen!";
-    } elseif (exists($connection, "Rennveranstalter", "RVName", $rvname)) {
-        echo "RVName existiert schon!";
     } else {
-        $erfolg = neuerRennveranstalterEintragen($connection, $rvname, $kennwort);
-
-        if ($erfolg) {
-            echo "Rennveranstalter erfolgreich erstellt!";
-        } else {
-            echo "Fehler bei der Registrierung!";
-        }
+        // Funktion aufrufen und Rückmeldung ausgeben
+        $result = neuerRennveranstalterEintragen($connection, $rvname, $kennwort);
+        echo $result['meldung'];
     }
 }
 ?>

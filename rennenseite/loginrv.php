@@ -1,5 +1,9 @@
-<!-- Deniz -->
+<!-- Autor:  Felix Weber
+ Datei:  rennenseite/loginrv.php
+ Zweck:  Login für Rennveranstalter. Prüft RVName und Kennwort gegen die Datenbank.
+ Bei Erfolg wird der RVName in der Session gespeichert und weitergeleitet. -->
 
+<!-- Login-Formular für Rennveranstalter -->
 <h4>Hast du bereits ein Konto? Dann melde dich hier unten an.</h4>
 
 <form method="POST">
@@ -14,11 +18,14 @@
 
 <?php
 
+// Formular wurde abgeschickt → Login verarbeiten
 if (isset($_POST['login_rv'])) {
 
-    $login = trim($_POST['rvname_login']);
+    // Eingaben auslesen und Leerzeichen entfernen
+    $login    = trim($_POST['rvname_login']);
     $kennwort = trim($_POST['kennwort_login']);
 
+    // Rennveranstalter anhand des RVName in der Datenbank suchen
     $sql = "
         SELECT RVName, Kennwort
         FROM Rennveranstalter
@@ -26,18 +33,22 @@ if (isset($_POST['login_rv'])) {
         LIMIT 1
     ";
 
+    // Prepared Statement gegen SQL-Injection
     $stmt = mysqli_prepare($connection, $sql);
     mysqli_stmt_bind_param($stmt, "s", $login);
     mysqli_stmt_execute($stmt);
 
     $result = mysqli_stmt_get_result($stmt);
 
+    // Prüfen ob der RVName existiert
     if (mysqli_num_rows($result) == 1) {
 
         $user = mysqli_fetch_assoc($result);
 
+        // Kennwort prüfen
         if ($kennwort == $user['Kennwort']) {
 
+            // Login erfolgreich → RVName in Session speichern und weiterleiten
             $_SESSION['login_rv'] = $user['RVName'];
 
             header("Location: index.php?seite=rennen");

@@ -1,19 +1,26 @@
-<!-- Felix -->
+<!-- Autor:  Felix Weber
+ Datei:  rennenseite/rennenergebnisse.php
+ Zweck:  Rennergebnisse erfassen. Einmalige Erfassung, sortiert nach Startnummer.
+ Zugriff nur für eingeloggte Rennveranstalter. -->
 
 <?php
 
+// Zugriffschutz: Nur eingeloggte Rennveranstalter dürfen diese Seite sehen
 if (!isset($_SESSION['login_rv'])) {
     echo "Bitte zuerst als Rennveranstalter einloggen.";
     exit;
 }
 
-$rv = $_SESSION['login_rv'];
+$rv = $_SESSION['login_rv']; // Eingeloggter Rennveranstalter aus der Session
 $meldungErgebnisse = "";
 
+// Ausgewählte RennID aus GET- oder POST-Parameter lesen
 $auswahl_id = $_REQUEST['auswahl_id'] ?? "";
 
+// Formular wurde abgeschickt → Ergebnisse speichern
 if (isset($_POST['speichern']) && $auswahl_id != "") {
 
+    // Sicherheitsprüfung: Gehört das Rennen wirklich zu diesem Rennveranstalter?
     $sqlCheckRennen = "
         SELECT RennID
         FROM Rennen
@@ -28,21 +35,25 @@ if (isset($_POST['speichern']) && $auswahl_id != "") {
     $resultCheckRennen = mysqli_stmt_get_result($stmtCheckRennen);
 
     if (mysqli_num_rows($resultCheckRennen) == 0) {
+        // Rennen gehört nicht zu diesem RV → kein Zugriff
         $meldungErgebnisse = "Kein Zugriff auf dieses Rennen.";
     } else {
 
-        $gespeichert = 0;
+        $gespeichert = 0; // Zähler für erfolgreich gespeicherte Ergebnisse
 
+        // Alle eingesendeten Platzierungen durchlaufen
         foreach ($_POST['platz'] as $startnr => $platz) {
 
             $startnr = trim($startnr);
-            $platz = trim($platz);
-            $zeit = trim($_POST['zeit'][$startnr] ?? "");
+            $platz   = trim($platz);
+            $zeit    = trim($_POST['zeit'][$startnr] ?? "");
 
+            // Unvollständige Einträge überspringen
             if ($platz == "" || $zeit == "") {
                 continue;
             }
 
+            // Ergebnis nur speichern wenn noch keine Platzierung vorhanden (einmalige Erfassung)
             $sqlUpdate = "
                 UPDATE Teilnahme
                 SET Platzierung = ?,
@@ -52,6 +63,7 @@ if (isset($_POST['speichern']) && $auswahl_id != "") {
                 AND Platzierung IS NULL
             ";
 
+            // Prepared Statement: i=Integer, s=String
             $stmtUpdate = mysqli_prepare($connection, $sqlUpdate);
             mysqli_stmt_bind_param(
                 $stmtUpdate,
@@ -64,11 +76,13 @@ if (isset($_POST['speichern']) && $auswahl_id != "") {
 
             mysqli_stmt_execute($stmtUpdate);
 
+            // Prüfen ob tatsächlich eine Zeile geändert wurde
             if (mysqli_stmt_affected_rows($stmtUpdate) > 0) {
                 $gespeichert++;
             }
         }
 
+        // Rückmeldung je nach Ergebnis
         if ($gespeichert > 0) {
             $meldungErgebnisse = $gespeichert . " Ergebnisse wurden gespeichert.";
         } else {
@@ -77,6 +91,7 @@ if (isset($_POST['speichern']) && $auswahl_id != "") {
     }
 }
 
+// Alle Rennen des eingeloggten Rennveranstalters für die Auswahlliste laden
 $sqlRennen = "
     SELECT RennID, Datum, StartOrt
     FROM Rennen
@@ -93,10 +108,12 @@ $rennen_liste = mysqli_stmt_get_result($stmtRennen);
 
 <h4>Rennergebnisse erfassen</h4>
 
+<!-- Erfolgs- oder Fehlermeldung anzeigen -->
 <?php if ($meldungErgebnisse != ""): ?>
     <p><b><?= h($meldungErgebnisse) ?></b></p>
 <?php endif; ?>
 
+<!-- Dropdown zur Rennauswahl, wird bei Änderung automatisch abgeschickt -->
 <form method="GET" action="index.php">
     <input type="hidden" name="seite" value="rennen">
 
@@ -117,6 +134,7 @@ $rennen_liste = mysqli_stmt_get_result($stmtRennen);
 <?php if ($auswahl_id != ""): ?>
 
     <?php
+    // Teilnehmer des ausgewählten Rennens mit Fahrerdaten laden, sortiert nach Startnummer
     $sqlTeilnehmer = "
         SELECT 
             T.Startnummer,
@@ -148,6 +166,7 @@ $rennen_liste = mysqli_stmt_get_result($stmtRennen);
 
     <?php else: ?>
 
+        <!-- Formular zur Ergebniserfassung -->
         <form method="POST" action="index.php?seite=rennen&auswahl_id=<?= h($auswahl_id) ?>">
             <input type="hidden" name="auswahl_id" value="<?= h($auswahl_id) ?>">
 
@@ -169,7 +188,7 @@ $rennen_liste = mysqli_stmt_get_result($stmtRennen);
                         <td><?= h($f['TCLoginName']) ?></td>
 
                         <?php if ($f['Platzierung'] === null): ?>
-
+                            <!-- Noch kein Ergebnis → Eingabefelder anzeigen -->
                             <td>
                                 <input type="number"
                                        name="platz[<?= h($f['Startnummer']) ?>]"
@@ -185,7 +204,7 @@ $rennen_liste = mysqli_stmt_get_result($stmtRennen);
                             </td>
 
                         <?php else: ?>
-
+                            <!-- Ergebnis bereits erfasst → nur anzeigen, nicht editierbar -->
                             <td><?= h($f['Platzierung']) ?></td>
                             <td><?= h($f['Fahrzeit']) ?></td>
 

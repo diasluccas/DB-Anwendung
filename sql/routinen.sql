@@ -85,7 +85,7 @@ DELIMITER ;
 
 
 /* 
-    Felix
+    FELIX Weber
     Stored Procedure: Fahrer speichern oder ändern
     Zweck:
     - Wenn Fahrer noch nicht existiert: INSERT
@@ -111,6 +111,7 @@ CREATE PROCEDURE sp_fahrer_speichern(
 BEGIN
     DECLARE v_fahrer_vorhanden INT DEFAULT 0;
 
+    -- Existenz prüfen
     SELECT COUNT(*)
     INTO v_fahrer_vorhanden
     FROM Fahrer
@@ -119,6 +120,7 @@ BEGIN
 
     IF v_fahrer_vorhanden = 0 THEN
 
+        -- Neuer Fahrer einfügen
         INSERT INTO Fahrer (
             MitarbeiterID,
             TCLoginName,
@@ -144,6 +146,7 @@ BEGIN
 
     ELSE
 
+        -- Bestehenden Fahrer aktualisieren
         UPDATE Fahrer
         SET Vorname = p_vorname,
             Nachname = p_nachname,
@@ -191,6 +194,49 @@ BEGIN
                 -- Startnummer im neuen Teilnahme-Datensatz setzen
         SET NEW.Startnummer = v_naechste_startnummer;
 
+    END IF;
+END//
+
+DELIMITER ;
+
+/* 
+    FELIX Weber
+    Stored Procedure: Rennveranstalter registrieren
+    Zweck:
+    - Prüft, ob RVName bereits existiert
+    - Legt neuen Rennveranstalter an, wenn der Name frei ist
+ */
+
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS sp_rennveranstalter_registrieren;//
+
+CREATE PROCEDURE sp_rennveranstalter_registrieren(
+    IN p_rvname VARCHAR(50),
+    IN p_kennwort VARCHAR(50)
+)
+BEGIN
+    DECLARE v_rv_vorhanden INT DEFAULT 0;
+
+    -- Handler bei SQL-Fehlern: Rollback und Fehler weiterreichen
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    -- Prüfen, ob RVName schon vergeben ist
+    SELECT COUNT(*)
+    INTO v_rv_vorhanden
+    FROM Rennveranstalter
+    WHERE RVName = p_rvname;
+
+    IF v_rv_vorhanden > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'RVName existiert bereits.';
+    ELSE
+        INSERT INTO Rennveranstalter (RVName, Kennwort)
+        VALUES (p_rvname, p_kennwort);
     END IF;
 END//
 
