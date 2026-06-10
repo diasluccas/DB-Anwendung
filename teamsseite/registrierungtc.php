@@ -4,7 +4,7 @@
 
 function neuesTeamEintragen($connection, $login, $vorname, $nachname, $kennwort, $teamname) {
 
-    // Stored Procedure übernimmt Prüfung und INSERT
+    // SP übernimmt Prüfung und INSERT
     $sql = "CALL sp_team_registrieren(?, ?, ?, ?, ?)";
 
     $stmt = mysqli_prepare($connection, $sql);
@@ -73,12 +73,15 @@ if (isset($_POST['submit_all'])) {
     $login = trim($_POST['loginname']);
     $vorname = trim($_POST['vorname']);
     $nachname = trim($_POST['nachname']);
-    $kennwort = trim($_POST['kennwort']);
+    $passwortEingabe = trim($_POST['kennwort']);
     $teamname = trim($_POST['teamname']);
 
-    if ($login == "" || $vorname == "" || $nachname == "" || $kennwort == "" || $teamname == "") {
+    if ($login == "" || $vorname == "" || $nachname == "" || $passwortEingabe == "" || $teamname == "") {
         echo "Bitte alle Pflichtfelder ausfüllen!";
     } else {
+
+        // Passwort wird nicht im Klartext gespeichert
+        $kennwort = password_hash($passwortEingabe, PASSWORD_DEFAULT);
 
         // Funktion aufrufen und Rückmeldung ausgeben
         $result = neuesTeamEintragen($connection, $login, $vorname, $nachname, $kennwort, $teamname);

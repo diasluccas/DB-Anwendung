@@ -1,27 +1,14 @@
 <!-- Deniz -->
 
-<h4>Hast du bereits ein Konto? Dann melde dich hier unten an.</h4>
-
-<form method="POST">
-    <label>Login Name:</label><br>
-    <input type="text" name="loginname_login" required><br>
-
-    <label>Passwort:</label><br>
-    <input type="password" name="kennwort_login" required><br><br>
-
-    <input type="submit" name="login_tc" value="Login">
-</form>
-
 <?php
 
-// Login wird verarbeitet, wenn das Formular abgeschickt wurde
 if (isset($_POST['login_tc'])) {
 
     // Eingaben aus dem Formular holen
     $login = trim($_POST['loginname_login']);
     $kennwort = trim($_POST['kennwort_login']);
 
-    // Teamchef nach LoginNames suchen
+    // Teamchef anhand des LoginNames suchen
     $sql = "
         SELECT LoginName, Kennwort
         FROM TeamChef
@@ -39,13 +26,11 @@ if (isset($_POST['login_tc'])) {
 
         $user = mysqli_fetch_assoc($result);
 
-        if ($kennwort == $user['Kennwort']) {
-
-            session_regenerate_id(true);
+        // Eingegebenes Passwort mit dem gespeicherten Hash vergleichen
+        if (password_verify($kennwort, $user['Kennwort'])) {
 
             $_SESSION['login_tc'] = $user['LoginName'];
 
-            // Nach erfolgreichem Login zur Teamseite weiterleiten
             header("Location: index.php?seite=teams");
             exit;
 
@@ -58,3 +43,15 @@ if (isset($_POST['login_tc'])) {
     }
 }
 ?>
+
+<h4>Hast du bereits ein Konto? Dann melde dich hier unten an.</h4>
+
+<form method="POST">
+    <label>Login Name:</label><br>
+    <input type="text" name="loginname_login" required><br>
+
+    <label>Passwort:</label><br>
+    <input type="password" name="kennwort_login" required><br><br>
+
+    <input type="submit" name="login_tc" value="Login">
+</form>

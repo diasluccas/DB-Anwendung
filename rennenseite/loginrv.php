@@ -8,10 +8,10 @@
 
 <form method="POST">
     <label>Rennveranstalter Name:</label><br>
-    <input type="text" name="rvname_login" required><br>
+    <input type="text" name="rvname_login" maxlength="50" required><br>
 
     <label>Passwort:</label><br>
-    <input type="password" name="kennwort_login" required><br><br>
+    <input type="password" name="kennwort_login" maxlength="100" required><br><br>
 
     <input type="submit" name="login_rv" value="Login">
 </form>
@@ -45,8 +45,8 @@ if (isset($_POST['login_rv'])) {
 
         $user = mysqli_fetch_assoc($result);
 
-        // Kennwort prüfen
-        if ($kennwort == $user['Kennwort']) {
+        // Passwort gegen den gespeicherten Hashwert prüfen
+        if (password_verify($kennwort, $user['Kennwort'])) {
 
             session_regenerate_id(true);
 
