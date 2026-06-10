@@ -1,5 +1,4 @@
 <!-- Felix Weber
- Datei:  rennenseite/rennenergebnisse.php
  Zweck:  Rennergebnisse erfassen. Einmalige Erfassung, sortiert nach Startnummer.
  Zugriff nur für eingeloggte Rennveranstalter. -->
 

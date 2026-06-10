@@ -1,5 +1,4 @@
  <!-- Felix Weber
- Datei:  rennenseite/rennenpflegen.php
  Zweck:  Neues Rennen anlegen mit Validierung und Datenbankzugriff.
  RennID wird über generiereZufallsID() vergeben.-->
 
@@ -61,7 +60,7 @@ if (isset($_POST['Rennen_erstellen'])) {
         $stmt = mysqli_prepare($connection, $sql);
 
         if ($stmt) {
-            // Parameter binden: i=Integer, s=String, d=Double
+            // Parameter binden
             mysqli_stmt_bind_param(
                 $stmt,
                 "issdiis",
