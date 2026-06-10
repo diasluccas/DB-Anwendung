@@ -20,7 +20,7 @@ if (isset($_POST['anmeldung_speichern'])) {
     $fahrerListe = $_POST['fahrer'] ?? [];
 
     if ($rennID == "") {
-    $meldungAnmeldung = "Bitte ein Rennen auswählen.";
+        $meldungAnmeldung = "Bitte ein Rennen auswählen.";
     } else {
 
         // Server-side prüfen, ob das Rennen wirklich noch in der Zukunft liegt
@@ -41,58 +41,58 @@ if (isset($_POST['anmeldung_speichern'])) {
             $meldungAnmeldung = "Dieses Rennen liegt nicht in der Zukunft oder existiert nicht.";
         } else {
 
-        $gespeichert = 0;
+            $gespeichert = 0;
 
-        foreach ($fahrerListe as $fahrerID) {
+            foreach ($fahrerListe as $fahrerID) {
 
-            $fahrerID = trim($fahrerID);
+                $fahrerID = trim($fahrerID);
 
-            if ($fahrerID == "") {
-                continue;
+                if ($fahrerID == "") {
+                    continue;
+                }
+
+                // Prüfen, ob der Fahrer bereits für dieses Rennen angemeldet ist
+                $sqlCheck = "
+                    SELECT MitarbeiterID
+                    FROM Teilnahme
+                    WHERE RennID = ?
+                    AND MitarbeiterID = ?
+                    AND TCLoginName = ?
+                    LIMIT 1
+                ";
+
+                $stmtCheck = mysqli_prepare($connection, $sqlCheck);
+                mysqli_stmt_bind_param($stmtCheck, "iss", $rennID, $fahrerID, $login);
+                mysqli_stmt_execute($stmtCheck);
+                $resultCheck = mysqli_stmt_get_result($stmtCheck);
+
+                if (mysqli_num_rows($resultCheck) > 0) {
+                    continue;
+                }
+
+                // Teilnahme speichern, Startnummer wird durch den Trigger vergeben
+                $sqlInsert = "
+                    INSERT INTO Teilnahme (
+                        MitarbeiterID,
+                        TCLoginName,
+                        RennID,
+                        Startnummer
+                    )
+                    VALUES (?, ?, ?, 0)
+                ";
+
+                $stmtInsert = mysqli_prepare($connection, $sqlInsert);
+                mysqli_stmt_bind_param($stmtInsert, "ssi", $fahrerID, $login, $rennID);
+
+                if (mysqli_stmt_execute($stmtInsert)) {
+                    $gespeichert++;
+                }
             }
 
-            // Prüfen, ob der Fahrer bereits für dieses Rennen angemeldet ist
-            $sqlCheck = "
-                SELECT MitarbeiterID
-                FROM Teilnahme
-                WHERE RennID = ?
-                AND MitarbeiterID = ?
-                AND TCLoginName = ?
-                LIMIT 1
-            ";
-
-            $stmtCheck = mysqli_prepare($connection, $sqlCheck);
-            mysqli_stmt_bind_param($stmtCheck, "iss", $rennID, $fahrerID, $login);
-            mysqli_stmt_execute($stmtCheck);
-            $resultCheck = mysqli_stmt_get_result($stmtCheck);
-
-            if (mysqli_num_rows($resultCheck) > 0) {
-                continue;
-            }
-
-            // Teilnahme speichern, Startnummer wird durch den Trigger vergeben
-            $sqlInsert = "
-                INSERT INTO Teilnahme (
-                MitarbeiterID,
-                TCLoginName,
-                RennID,
-                Startnummer
-                )
-                VALUES (?, ?, ?, 0)
-            ";
-
-            $stmtInsert = mysqli_prepare($connection, $sqlInsert);
-            mysqli_stmt_bind_param($stmtInsert, "ssi", $fahrerID, $login, $rennID);
-
-            if (mysqli_stmt_execute($stmtInsert)) {
-                $gespeichert++;
-            }
-        }
-
-        if ($gespeichert > 0) {
-            $meldungAnmeldung = $gespeichert . "Fahrer erfolgreich angemeldet.";
-        } else {
-            $meldungAnmeldung = "Es wurden keine neuen Fahrer angemeldet.";
+            if ($gespeichert > 0) {
+                $meldungAnmeldung = $gespeichert . " Fahrer erfolgreich angemeldet.";
+            } else {
+                $meldungAnmeldung = "Es wurden keine neuen Fahrer angemeldet.";
             }
         }
     }
@@ -128,71 +128,70 @@ if (isset($_POST['copy_speichern'])) {
             $meldungAnmeldung = "Das Zielrennen liegt nicht in der Zukunft oder existiert nicht.";
         } else {
 
-        // Fahrer des Quellrennens laden
-        $sqlAlteFahrer = "
-            SELECT MitarbeiterID
-            FROM Teilnahme
-            WHERE RennID = ?
-            AND TCLoginName = ?
-            ORDER BY Startnummer
-        ";
-
-        $stmtAlteFahrer = mysqli_prepare($connection, $sqlAlteFahrer);
-        mysqli_stmt_bind_param($stmtAlteFahrer, "is", $altesRennen, $login);
-        mysqli_stmt_execute($stmtAlteFahrer);
-        $resultAlteFahrer = mysqli_stmt_get_result($stmtAlteFahrer);
-
-        $kopiert = 0;
-
-        while ($row = mysqli_fetch_assoc($resultAlteFahrer)) {
-
-            $fahrerID = $row['MitarbeiterID'];
-
-            // Prüfen, ob der Fahrer im Zielrennen bereits angemeldet ist
-            $sqlCheckCopy = "
+            // Fahrer des Quellrennens laden
+            $sqlAlteFahrer = "
                 SELECT MitarbeiterID
                 FROM Teilnahme
                 WHERE RennID = ?
-                AND MitarbeiterID = ?
                 AND TCLoginName = ?
-                LIMIT 1
+                ORDER BY Startnummer
             ";
 
-            $stmtCheckCopy = mysqli_prepare($connection, $sqlCheckCopy);
-            mysqli_stmt_bind_param($stmtCheckCopy, "iss", $neuesRennen, $fahrerID, $login);
-            mysqli_stmt_execute($stmtCheckCopy);
-            $resultCheckCopy = mysqli_stmt_get_result($stmtCheckCopy);
+            $stmtAlteFahrer = mysqli_prepare($connection, $sqlAlteFahrer);
+            mysqli_stmt_bind_param($stmtAlteFahrer, "is", $altesRennen, $login);
+            mysqli_stmt_execute($stmtAlteFahrer);
+            $resultAlteFahrer = mysqli_stmt_get_result($stmtAlteFahrer);
 
-            if (mysqli_num_rows($resultCheckCopy) > 0) {
-                continue;
+            $kopiert = 0;
+
+            while ($row = mysqli_fetch_assoc($resultAlteFahrer)) {
+
+                $fahrerID = $row['MitarbeiterID'];
+
+                // Prüfen, ob der Fahrer im Zielrennen bereits angemeldet ist
+                $sqlCheckCopy = "
+                    SELECT MitarbeiterID
+                    FROM Teilnahme
+                    WHERE RennID = ?
+                    AND MitarbeiterID = ?
+                    AND TCLoginName = ?
+                    LIMIT 1
+                ";
+
+                $stmtCheckCopy = mysqli_prepare($connection, $sqlCheckCopy);
+                mysqli_stmt_bind_param($stmtCheckCopy, "iss", $neuesRennen, $fahrerID, $login);
+                mysqli_stmt_execute($stmtCheckCopy);
+                $resultCheckCopy = mysqli_stmt_get_result($stmtCheckCopy);
+
+                if (mysqli_num_rows($resultCheckCopy) > 0) {
+                    continue;
+                }
+
+                // Kopierte Teilnahme speichern, Startnummer kommt vom Trigger
+                $sqlInsertCopy = "
+                    INSERT INTO Teilnahme (
+                        MitarbeiterID,
+                        TCLoginName,
+                        RennID,
+                        Startnummer
+                    )
+                    VALUES (?, ?, ?, 0)
+                ";
+
+                $stmtInsertCopy = mysqli_prepare($connection, $sqlInsertCopy);
+                mysqli_stmt_bind_param($stmtInsertCopy, "ssi", $fahrerID, $login, $neuesRennen);
+
+                if (mysqli_stmt_execute($stmtInsertCopy)) {
+                    $kopiert++;
+                }
             }
 
-            // Kopierte Teilnahme speichern, Startnummer kommt vom Trigger
-            $sqlInsertCopy = "
-                INSERT INTO Teilnahme (
-                MitarbeiterID,
-                TCLoginName,
-                RennID,
-                Startnummer
-                )
-                VALUES (?, ?, ?, 0)
-            ";
-
-            $stmtInsertCopy = mysqli_prepare($connection, $sqlInsertCopy);
-            mysqli_stmt_bind_param($stmtInsertCopy, "ssi", $fahrerID, $login, $neuesRennen);
-
-            if (mysqli_stmt_execute($stmtInsertCopy)) {
-                $kopiert++;
+            if ($kopiert > 0) {
+                $meldungAnmeldung = $kopiert . " Fahrer wurden erfolgreich kopiert.";
+            } else {
+                $meldungAnmeldung = "Es wurden keine neuen Fahrer kopiert.";
             }
         }
-
-        if ($kopiert > 0) {
-            $meldungAnmeldung = $kopiert . " Fahrer wurden erfolgreich kopiert.";
-        } else {
-            $meldungAnmeldung = "Es wurden keine neuen Fahrer kopiert.";
-        }
-        }
-    }
     }
 }
 
