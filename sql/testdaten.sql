@@ -19,7 +19,7 @@ CALL sp_team_registrieren(
     'luccas',
     'Luccas',
     'Dias',
-    '123',
+    '$2y$12$VF9D2k3fXdljwmVsdTLJP.adLX9ie0J4bxtmEY6xhbO5YeqDu/nkq',
     'Rennteam Bodensee'
 );
 
@@ -27,7 +27,7 @@ CALL sp_team_registrieren(
     'deniz',
     'Deniz',
     'Yilmaz',
-    '123',
+    '$2y$12$VF9D2k3fXdljwmVsdTLJP.adLX9ie0J4bxtmEY6xhbO5YeqDu/nkq',
     'Speed Riders'
 );
 
@@ -35,13 +35,13 @@ CALL sp_team_registrieren(
     'felix',
     'Felix',
     'Schneider',
-    '123',
+    '$2y$12$VF9D2k3fXdljwmVsdTLJP.adLX9ie0J4bxtmEY6xhbO5YeqDu/nkq',
     'Mountain Kings'
 );
 
 INSERT INTO Rennveranstalter (RVName, Kennwort) VALUES
-('rv_sued', '123'),
-('rv_nord', '123');
+('rv_sued', '$2y$12$VF9D2k3fXdljwmVsdTLJP.adLX9ie0J4bxtmEY6xhbO5YeqDu/nkq'),
+('rv_nord', '$2y$12$VF9D2k3fXdljwmVsdTLJP.adLX9ie0J4bxtmEY6xhbO5YeqDu/nkq');
 
 CALL sp_fahrer_speichern(
     'F001',
