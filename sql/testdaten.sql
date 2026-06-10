@@ -26,7 +26,7 @@ CALL sp_team_registrieren(
 CALL sp_team_registrieren(
     'deniz',
     'Deniz',
-    'Yilmaz',
+    'Persbach',
     '$2y$12$VF9D2k3fXdljwmVsdTLJP.adLX9ie0J4bxtmEY6xhbO5YeqDu/nkq',
     'Speed Riders'
 );
@@ -34,7 +34,7 @@ CALL sp_team_registrieren(
 CALL sp_team_registrieren(
     'felix',
     'Felix',
-    'Schneider',
+    'Weber',
     '$2y$12$VF9D2k3fXdljwmVsdTLJP.adLX9ie0J4bxtmEY6xhbO5YeqDu/nkq',
     'Mountain Kings'
 );
