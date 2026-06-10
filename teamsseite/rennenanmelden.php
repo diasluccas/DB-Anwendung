@@ -106,7 +106,7 @@ if (isset($_POST['copy_speichern'])) {
 
     if ($altesRennen == "" || $neuesRennen == "") {
         $meldungAnmeldung = "Bitte Quellrennen und Zielrennen auswählen.";
-     elseif ($altesRennen == $neuesRennen) {
+    } elseif ($altesRennen == $neuesRennen) {
         $meldungAnmeldung = "Quellrennen und Zielrennen dürfen nicht identisch sein.";
     } else {
 
