@@ -48,6 +48,8 @@ if (isset($_POST['login_rv'])) {
         // Kennwort prüfen
         if ($kennwort == $user['Kennwort']) {
 
+            session_regenerate_id(true);
+
             // Login erfolgreich → RVName in Session speichern und weiterleiten
             $_SESSION['login_rv'] = $user['RVName'];
 

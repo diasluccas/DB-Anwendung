@@ -41,6 +41,8 @@ if (isset($_POST['login_tc'])) {
 
         if ($kennwort == $user['Kennwort']) {
 
+            session_regenerate_id(true);
+
             $_SESSION['login_tc'] = $user['LoginName'];
 
             // Nach erfolgreichem Login zur Teamseite weiterleiten
