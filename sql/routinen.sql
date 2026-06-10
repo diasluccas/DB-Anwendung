@@ -18,7 +18,7 @@ CREATE PROCEDURE sp_team_registrieren(
     IN p_loginname VARCHAR(50),
     IN p_vorname VARCHAR(50),
     IN p_nachname VARCHAR(50),
-    IN p_kennwort VARCHAR(255),
+    IN p_kennwort VARCHAR(50),
     IN p_teamname VARCHAR(50)
 )
 BEGIN
@@ -181,7 +181,7 @@ DROP PROCEDURE IF EXISTS sp_rv_registrieren;//
 
 CREATE PROCEDURE sp_rv_registrieren(
     IN p_rvname VARCHAR(50),
-    IN p_kennwort VARCHAR(255)
+    IN p_kennwort VARCHAR(50)
 )
 BEGIN
     DECLARE v_rv_vorhanden INT DEFAULT 0;

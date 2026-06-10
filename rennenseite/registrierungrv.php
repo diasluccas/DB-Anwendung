@@ -6,10 +6,9 @@ Zweck:  Registrierung eines neuen Rennveranstalters.
 
 <?php
 
-function neuerRennveranstalterEintragen($connection, $rvname, $kennwortHash) {
+function neuerRennveranstalterEintragen($connection, $rvname, $kennwort) {
 
     // SP übernimmt sowohl Prüfung als auch INSERT
-    // Das Kennwort wird bereits vorher mit password_hash() gehasht
     $sql = "CALL sp_rv_registrieren(?, ?)";
 
     $stmt = mysqli_prepare($connection, $sql);
@@ -21,15 +20,15 @@ function neuerRennveranstalterEintragen($connection, $rvname, $kennwortHash) {
         ];
     }
 
-    mysqli_stmt_bind_param($stmt, "ss", $rvname, $kennwortHash);
+    mysqli_stmt_bind_param($stmt, "ss", $rvname, $kennwort);
 
     try {
-        mysqli_stmt_execute($stmt);
+    mysqli_stmt_execute($stmt);
 
-        return [
-            "erfolg" => true,
-            "meldung" => "Rennveranstalter erfolgreich erstellt!"
-        ];
+    return [
+        "erfolg" => true,
+        "meldung" => "Rennveranstalter erfolgreich erstellt!"
+    ];
 
     } catch (mysqli_sql_exception $e) {
 
@@ -46,10 +45,10 @@ function neuerRennveranstalterEintragen($connection, $rvname, $kennwortHash) {
 
 <form method="POST">
     <label>Rennveranstalter Name:</label><br>
-    <input type="text" name="rv_name" maxlength="50" required><br>
+    <input type="text" name="rv_name" required><br>
 
     <label>Passwort:</label><br>
-    <input type="password" name="rv_kennwort" maxlength="100" required><br><br>
+    <input type="password" name="rv_kennwort" required><br><br>
 
     <input type="submit" name="registrierung_rv" value="Erstellen">
 </form>
@@ -65,12 +64,8 @@ if (isset($_POST['registrierung_rv'])) {
     if ($rvname == "" || $kennwort == "") {
         echo "Bitte alle Pflichtfelder ausfüllen!";
     } else {
-
-        // Passwort wird nicht im Klartext gespeichert, sondern als Hashwert
-        $kennwortHash = password_hash($kennwort, PASSWORD_DEFAULT);
-
         // Funktion aufrufen und Rückmeldung ausgeben
-        $result = neuerRennveranstalterEintragen($connection, $rvname, $kennwortHash);
+        $result = neuerRennveranstalterEintragen($connection, $rvname, $kennwort);
         echo h($result['meldung']);
     }
 }

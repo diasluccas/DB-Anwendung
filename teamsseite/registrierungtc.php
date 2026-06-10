@@ -2,10 +2,9 @@
 
 <?php
 
-function neuesTeamEintragen($connection, $login, $vorname, $nachname, $kennwortHash, $teamname) {
+function neuesTeamEintragen($connection, $login, $vorname, $nachname, $kennwort, $teamname) {
 
     // Stored Procedure übernimmt Prüfung und INSERT
-    // Das Kennwort wird bereits vorher mit password_hash() gehasht
     $sql = "CALL sp_team_registrieren(?, ?, ?, ?, ?)";
 
     $stmt = mysqli_prepare($connection, $sql);
@@ -23,7 +22,7 @@ function neuesTeamEintragen($connection, $login, $vorname, $nachname, $kennwortH
         $login,
         $vorname,
         $nachname,
-        $kennwortHash,
+        $kennwort,
         $teamname
     );
 
@@ -49,19 +48,19 @@ function neuesTeamEintragen($connection, $login, $vorname, $nachname, $kennwortH
 
 <form method="POST">
     <label>Login Name:</label><br>
-    <input type="text" name="loginname" maxlength="50" required><br>
+    <input type="text" name="loginname" required><br>
 
     <label>Vorname:</label><br>
-    <input type="text" name="vorname" maxlength="50" required><br>
+    <input type="text" name="vorname" required><br>
 
     <label>Nachname:</label><br>
-    <input type="text" name="nachname" maxlength="50" required><br>
+    <input type="text" name="nachname" required><br>
 
     <label>Passwort:</label><br>
-    <input type="password" name="kennwort" maxlength="100" required><br>
+    <input type="password" name="kennwort" required><br>
 
     <label>Team Name:</label><br>
-    <input type="text" name="teamname" maxlength="50" required><br><br>
+    <input type="text" name="teamname" required><br><br>
 
     <input type="submit" name="submit_all" value="Registrieren">
 </form>
@@ -81,11 +80,8 @@ if (isset($_POST['submit_all'])) {
         echo "Bitte alle Pflichtfelder ausfüllen!";
     } else {
 
-        // Passwort wird nicht im Klartext gespeichert, sondern als Hashwert
-        $kennwortHash = password_hash($kennwort, PASSWORD_DEFAULT);
-
         // Funktion aufrufen und Rückmeldung ausgeben
-        $result = neuesTeamEintragen($connection, $login, $vorname, $nachname, $kennwortHash, $teamname);
+        $result = neuesTeamEintragen($connection, $login, $vorname, $nachname, $kennwort, $teamname);
         echo h($result['meldung']);
     }
 }

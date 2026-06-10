@@ -7,13 +7,13 @@ CREATE TABLE TeamChef (
     LoginName VARCHAR(50) PRIMARY KEY,
     Vorname VARCHAR(50),
     Nachname VARCHAR(50),
-    Kennwort VARCHAR(255) NOT NULL
+    Kennwort VARCHAR(50)
 );
 
 
 CREATE TABLE Rennveranstalter (
     RVName VARCHAR(50) PRIMARY KEY,
-    Kennwort VARCHAR(255) NOT NULL
+    Kennwort VARCHAR(50)
 );
 
 
