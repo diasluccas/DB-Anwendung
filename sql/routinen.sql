@@ -259,6 +259,8 @@ DELIMITER ;
 
 DELIMITER //
 
+DROP TRIGGER IF EXISTS trg_training_pruefen;//
+
 CREATE TRIGGER trg_training_pruefen
 BEFORE INSERT ON Training
 FOR EACH ROW

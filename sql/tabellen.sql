@@ -1,5 +1,8 @@
 -- GRUPPE 12 - Grundstruktur / gemeinsame Datei
 
+
+-- Tabellen --
+
 CREATE TABLE TeamChef (
     LoginName VARCHAR(50) PRIMARY KEY,
     Vorname VARCHAR(50),
@@ -120,3 +123,21 @@ CREATE TABLE Training (
         ON DELETE SET NULL
         ON UPDATE CASCADE
 );
+
+
+-- Indizes --
+
+CREATE INDEX idx_fahrer_tc_name
+ON Fahrer (TCLoginName, Nachname, Vorname);
+
+CREATE INDEX idx_training_fahrer_zeitraum_ziel
+ON Training (TCLoginName, MitarbeiterID, Datum, Ziel);
+
+CREATE INDEX idx_rennen_datum
+ON Rennen (Datum, StartOrt);
+
+CREATE INDEX idx_rennen_rv_datum
+ON Rennen (RVName, Datum);
+
+CREATE INDEX idx_teilnahme_tc_rennen
+ON Teilnahme (TCLoginName, RennID);

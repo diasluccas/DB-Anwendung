@@ -20,8 +20,26 @@ if (isset($_POST['anmeldung_speichern'])) {
     $fahrerListe = $_POST['fahrer'] ?? [];
 
     if ($rennID == "") {
-        $meldungAnmeldung = "Bitte ein Rennen auswählen.";
+    $meldungAnmeldung = "Bitte ein Rennen auswählen.";
     } else {
+
+        // Server-side prüfen, ob das Rennen wirklich noch in der Zukunft liegt
+        $sqlCheckRennen = "
+            SELECT RennID
+            FROM Rennen
+            WHERE RennID = ?
+            AND Datum >= CURDATE()
+            LIMIT 1
+        ";
+
+        $stmtCheckRennen = mysqli_prepare($connection, $sqlCheckRennen);
+        mysqli_stmt_bind_param($stmtCheckRennen, "i", $rennID);
+        mysqli_stmt_execute($stmtCheckRennen);
+        $resultCheckRennen = mysqli_stmt_get_result($stmtCheckRennen);
+
+        if (mysqli_num_rows($resultCheckRennen) == 0) {
+            $meldungAnmeldung = "Dieses Rennen liegt nicht in der Zukunft oder existiert nicht.";
+        } else {
 
         $gespeichert = 0;
 
@@ -75,6 +93,7 @@ if (isset($_POST['anmeldung_speichern'])) {
             $meldungAnmeldung = $gespeichert . "Fahrer erfolgreich angemeldet.";
         } else {
             $meldungAnmeldung = "Es wurden keine neuen Fahrer angemeldet.";
+            }
         }
     }
 }
@@ -87,9 +106,27 @@ if (isset($_POST['copy_speichern'])) {
 
     if ($altesRennen == "" || $neuesRennen == "") {
         $meldungAnmeldung = "Bitte Quellrennen und Zielrennen auswählen.";
-    } elseif ($altesRennen == $neuesRennen) {
+     elseif ($altesRennen == $neuesRennen) {
         $meldungAnmeldung = "Quellrennen und Zielrennen dürfen nicht identisch sein.";
     } else {
+
+        // Server-side prüfen, ob das Zielrennen wirklich noch in der Zukunft liegt
+        $sqlCheckZielrennen = "
+            SELECT RennID
+            FROM Rennen
+            WHERE RennID = ?
+            AND Datum >= CURDATE()
+            LIMIT 1
+        ";
+
+        $stmtCheckZielrennen = mysqli_prepare($connection, $sqlCheckZielrennen);
+        mysqli_stmt_bind_param($stmtCheckZielrennen, "i", $neuesRennen);
+        mysqli_stmt_execute($stmtCheckZielrennen);
+        $resultCheckZielrennen = mysqli_stmt_get_result($stmtCheckZielrennen);
+
+        if (mysqli_num_rows($resultCheckZielrennen) == 0) {
+            $meldungAnmeldung = "Das Zielrennen liegt nicht in der Zukunft oder existiert nicht.";
+        } else {
 
         // Fahrer des Quellrennens laden
         $sqlAlteFahrer = "
@@ -154,6 +191,8 @@ if (isset($_POST['copy_speichern'])) {
         } else {
             $meldungAnmeldung = "Es wurden keine neuen Fahrer kopiert.";
         }
+        }
+    }
     }
 }
 
