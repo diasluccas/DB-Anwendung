@@ -4,10 +4,10 @@
 
 <form method="POST">
     <label>Login Name:</label><br>
-    <input type="text" name="loginname_login" required><br>
+    <input type="text" name="loginname_login" maxlength="50" required><br>
 
     <label>Passwort:</label><br>
-    <input type="password" name="kennwort_login" required><br><br>
+    <input type="password" name="kennwort_login" maxlength="100" required><br><br>
 
     <input type="submit" name="login_tc" value="Login">
 </form>
@@ -21,7 +21,7 @@ if (isset($_POST['login_tc'])) {
     $login = trim($_POST['loginname_login']);
     $kennwort = trim($_POST['kennwort_login']);
 
-    // Teamchef nach LoginNames suchen
+    // Teamchef nach LoginName suchen
     $sql = "
         SELECT LoginName, Kennwort
         FROM TeamChef
@@ -39,7 +39,8 @@ if (isset($_POST['login_tc'])) {
 
         $user = mysqli_fetch_assoc($result);
 
-        if ($kennwort == $user['Kennwort']) {
+        // Passwort gegen den gespeicherten Hashwert prüfen
+        if (password_verify($kennwort, $user['Kennwort'])) {
 
             session_regenerate_id(true);
 
